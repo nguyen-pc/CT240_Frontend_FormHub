@@ -37,9 +37,9 @@
               >
                 {{ column.title }}
               </th>
-              <!-- <th class="bg-gray-200 p-2 text-gray-600 font-bold block md:table-cell">
+              <th class="bg-gray-200 p-2 text-gray-600 font-bold block md:table-cell">
                 Hành động
-              </th> -->
+              </th>
             </tr>
           </thead>
           <tbody class="block md:table-row-group">
@@ -55,10 +55,29 @@
               >
                 {{ renderCell(row, column) }}
               </td>
-              <!-- <td class="p-2 text-gray-800 block md:table-cell">
-                <button @click="editBook(row)" class="mr-2 text-blue-500">Sửa</button>
-                <button @click="deleteBook(row)" class="text-red-500">Xóa</button>
-              </td> -->
+              <td class="p-2 text-gray-800 block md:table-cell">
+                <div class="flex items-center gap-2">
+                  <select
+                    :value="row.status"
+                    @change="(e) => updateBorrowStatus(row._id, e.target.value)"
+                    :class="getStatusClass(row.status)"
+                    class="border rounded px-2 py-1 outline-none"
+                    :disabled="!canChangeStatus(row.status)"
+                  >
+                    <option
+                      v-for="status in availableStatuses(row)"
+                      :key="status"
+                      :value="status"
+                      :class="getStatusClass(status)"
+                    >
+                      {{ getStatusText(status) }}
+                    </option>
+                  </select>
+                  <button class="p-2 bg-slate-500 rounded-lg" @click="navigateToBorrow">
+                    Update
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -78,6 +97,14 @@ const router = useRouter();
 const borrowStore = useBorrowStore();
 const query = ref("");
 
+// Định nghĩa enum status nếu chưa có
+enum BorrowStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  RETURNED = "returned",
+  REJECTED = "rejected",
+}
+
 const columns = [
   { title: "Tên username", dataIndex: "user.username", key: "user._id" },
   { title: "Tên sách", dataIndex: "book.name", key: "book" },
@@ -89,6 +116,7 @@ const columns = [
 const fetchBorrow = async () => {
   try {
     await borrowStore.getAllBorrows();
+    // location.replace("http://localhost:5173/borrow");
   } catch (error) {
     console.error("Error fetching books:", error);
   }
@@ -138,6 +166,76 @@ const renderCell = (row: any, column: any) => {
   return value !== undefined && value !== null ? value : "";
 };
 
+// Kiểm tra xem có thể thay đổi trạng thái không
+const canChangeStatus = (status: BorrowStatus) => {
+  return ![BorrowStatus.RETURNED, BorrowStatus.REJECTED].includes(status);
+};
+
+// Hàm lấy danh sách trạng thái có thể chuyển đổi
+const availableStatuses = (borrow: any) => {
+  switch (borrow.status) {
+    case BorrowStatus.PENDING:
+      return [BorrowStatus.PENDING, BorrowStatus.APPROVED, BorrowStatus.REJECTED];
+    case BorrowStatus.APPROVED:
+      return [BorrowStatus.APPROVED, BorrowStatus.RETURNED];
+    case BorrowStatus.RETURNED:
+      return [borrow.status];
+    case BorrowStatus.REJECTED:
+      return [borrow.status]; // Không cho phép thay đổi nếu đã trả hoặc từ chối
+    default:
+      return [BorrowStatus.PENDING];
+  }
+};
+
+// Hàm lấy text hiển thị cho từng status
+const getStatusText = (status: BorrowStatus) => {
+  const statusMap = {
+    [BorrowStatus.PENDING]: "Đang chờ duyệt",
+    [BorrowStatus.APPROVED]: "Đã duyệt",
+    [BorrowStatus.RETURNED]: "Đã trả sách",
+    [BorrowStatus.REJECTED]: "Đã từ chối",
+  };
+  return statusMap[status] || status;
+};
+
+// Hàm lấy class cho từng status
+const getStatusClass = (status: BorrowStatus) => {
+  const statusClasses = {
+    [BorrowStatus.PENDING]: "bg-yellow-50 text-yellow-600",
+    [BorrowStatus.APPROVED]: "bg-green-50 text-green-600",
+    [BorrowStatus.RETURNED]: "bg-blue-50 text-blue-600",
+    [BorrowStatus.REJECTED]: "bg-red-50 text-red-600",
+  };
+  return statusClasses[status] || "";
+};
+
+// Hàm xử lý cập nhật trạng thái
+const updateBorrowStatus = async (borrowId: string, newStatus: BorrowStatus) => {
+  try {
+    const actionText = {
+      [BorrowStatus.APPROVED]: "duyệt",
+      [BorrowStatus.REJECTED]: "từ chối",
+      [BorrowStatus.RETURNED]: "Da trả",
+    }[newStatus];
+
+    const confirmed = confirm(`Xác nhận ${actionText} yêu cầu mượn sách này?`);
+    if (confirmed) {
+      await borrowStore.updateBorrowStatus(borrowId, newStatus);
+      alert(`Cập nhật trạng thái thành công`);
+
+      await fetchBorrow();
+    }
+    location.replace("http://localhost:5173/borrow");
+  } catch (error) {
+    console.error("Error updating borrow status:", error);
+    alert("Cập nhật trạng thái thất bại");
+  }
+};
+
+const navigateToBorrow = () => {
+  location.replace("http://localhost:5173/borrow");
+};
+
 // const editBook = (book: any) => {
 //   router.push({ name: "book:edit", params: { id: book._id } });
 // };
@@ -169,5 +267,22 @@ td {
 }
 th {
   background-color: #f4f4f4;
+}
+
+select {
+  @apply appearance-none cursor-pointer;
+  background-image: url("data:image/svg+xml,..."); /* Thêm icon dropdown */
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  padding-right: 2rem;
+}
+
+select option {
+  @apply py-1;
+}
+
+/* Màu nền cho các option khi hover */
+select option:hover {
+  @apply bg-gray-100;
 }
 </style>

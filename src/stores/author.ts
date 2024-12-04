@@ -6,6 +6,8 @@ export interface Author {
   name: string
   address: string
   detail: string
+  data: any
+  totalPage: any
 }
 
 export interface State {

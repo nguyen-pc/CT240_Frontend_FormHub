@@ -202,7 +202,7 @@ let coverPath = ''
 const handleFileChange = async (files: File[]) => {
   try {
     if (files.length > 0) {
-      const fileData = files[0].file;
+      const fileData = (files[0].file);
       formData.cover = fileData
 
 

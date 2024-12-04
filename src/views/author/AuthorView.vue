@@ -64,8 +64,8 @@
         </table>
       </template>
     </div>
-      <!-- Pagination -->
-      <nav aria-label="Pagination" class="mt-4 flex justify-center">
+    <!-- Pagination -->
+    <nav aria-label="Pagination" class="mt-4 flex justify-center">
       <ul class="pagination flex gap-2">
         <li>
           <button
@@ -76,8 +76,14 @@
             Trước
           </button>
         </li>
-        <li v-for="page in totalPage" :key="page" :class="{ 'font-bold': page === pageNumber }">
-          <button @click="changePage(page)" class="p-2 bg-gray-200 rounded">{{ page }}</button>
+        <li
+          v-for="page in totalPage"
+          :key="page"
+          :class="{ 'font-bold': page === pageNumber }"
+        >
+          <button @click="changePage(page)" class="p-2 bg-gray-200 rounded">
+            {{ page }}
+          </button>
         </li>
         <li>
           <button
