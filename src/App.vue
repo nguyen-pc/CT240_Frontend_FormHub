@@ -1,9 +1,10 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
+<script setup>
+import MainPage from './views/MainPage.vue'
 </script>
 
 <template>
-  <div id="app">
-    <RouterView />
-  </div>
+    <MainPage />
+ 
 </template>
+<style>
+</style>
