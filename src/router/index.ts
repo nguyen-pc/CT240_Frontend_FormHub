@@ -26,8 +26,14 @@ const router = createRouter({
     {
       path: '/main/project',
       name: 'project',
-      component: ProjectPage,
+      component: import('../components/Survey.vue'),
       meta: { breadcrumb: "Dự án"}
+    },
+    {
+      path: '/main/project/file',
+      name: 'project-file',
+      component: import('../components/File.vue'),
+      meta: { breadcrumb: "Tài liệu"}
     },
     {
       path: '/main/project/form',

@@ -1,16 +1,16 @@
 <template>
     <div class="project-detail">
-        <div class="header-info">
+        <!-- <div class="header-info">
             <h1 id="logoName">FORM HUB</h1>
             <div class="user-info">
                 <span class="user-name">Chí Thiên</span>
                 <div class="user-avatar">
-                    <!-- <img src="avatar-placeholder" alt="avatar"> Thêm ảnh thực tế -->
-                </div>
+                    <img src="avatar-placeholder" alt="avatar"> Thêm ảnh thực tế -->
+                <!-- </div>
             </div>
         </div>
 
-        <div class="breadcrumb">Trang chủ > Project 1</div>
+        <div class="breadcrumb">Trang chủ > Project 1</div> -->
 
         <div class="content-wrapper">
             <div class="sidebar">
@@ -19,7 +19,9 @@
                 </div>
                 <div class="sidebar-menu">
                     <button class="active">📋 Phiếu khảo sát</button>
-                    <button>📁 Tài liệu</button>
+                    <router-link to="/main/project/file">
+                        <button>📁 Tài liệu</button>
+                    </router-link>
                 </div>
             </div>
 
@@ -45,7 +47,8 @@
                     <h3 class="board-title">Danh sách phiếu khảo sát (7)</h3>
                     <div class="survey-grid">
                         <div v-for="survey in project.surveys" :key="survey.id" class="survey-card">
-                            <div class="card-header">
+                            <router-link to="/main/project/form">
+                                <div class="card-header">
                                 <h4>{{ survey.name }}</h4>
                                 <div class="card-actions">
                                     <button class="icon-btn">⋮</button>
@@ -54,6 +57,7 @@
                             <div class="card-stats">
                                 <span>📩 {{ survey.responses }} phản hồi</span>
                             </div>
+                        </router-link>
                         </div>
                     </div>
                 </div>
@@ -92,7 +96,7 @@ export default {
     box-sizing: border-box;
 }
 
-.project-detail {
+.project-details {
     height: 100vh;
     /* Full height of the viewport */
     width: 100vw;
@@ -201,7 +205,7 @@ export default {
 }
 
 .sidebar-menu button.active {
-    background: #4248e8;
+    background: #6a11cb;
     color: white;
     font-weight: 500;
 }

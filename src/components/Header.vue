@@ -18,8 +18,6 @@
 </template>
 
 <script>
-import { useRoute } from 'vue-router';
-const curRoute = useRoute();
 import Breadcrumb from './Breadcrumb.vue';
 export default {
   components: {
@@ -43,11 +41,19 @@ export default {
   methods: {
     createSegments(route) {
       const segments = [{ name: 'Trang chủ', path: '/main' }];
-      if (route.name === 'project') {
+      if (route.name === 'project' ) {
         segments.push({ name: 'Dự án', path: '/main/project' });
-      } else if (route.name === 'form'||route.name ==='form-result') {
+      }
+      else if(route.name === 'project-file'){
+        segments.push({ name: 'Dự án', path: '/main/project/file' });
+      }
+       else if (route.name === 'form') {
         segments.push({ name: 'Dự án', path: '/main/project' });
         segments.push({ name: 'Khảo sát', path: `/main/project/form` });
+      }
+      else if(route.name ==='form-result'){
+        segments.push({ name: 'Dự án', path: '/main/project' });
+        segments.push({ name: 'Khảo sát', path: `/main/project/form/result` });
       }
       return segments;
     },
@@ -63,7 +69,7 @@ export default {
 
 .direction {
   border-radius: 10px;
-  background: linear-gradient(90deg, #4c669f, #3b5998, #192f6a);
+  background: linear-gradient(to right, #6a11cb, #2575fc);
   color: white;
   padding: 5px;
   display: flex;

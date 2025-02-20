@@ -115,16 +115,17 @@ export default {
 }
 
 .sidebar-menu button.active {
-    background: #80acef;
+    background: #6a11cb;
     color: white;
     font-weight: 500;
 }
 
 .question-content {
-    background-color: #2575fc;
+    background: #6a11cb;
     border-radius: 10px;
     padding: 10px;
     width: 70%;
+    color: white;
 }
 
 .question-box {
@@ -189,7 +190,7 @@ export default {
 }
 
 .btn {
-    background: #4c51bf;
+    background: #6a11cb;
     color: white;
     border: none;
     border-radius: 8px;
