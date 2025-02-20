@@ -1,8 +1,8 @@
 <template>
   <div class="dashboard">
     <div class="search-bar">
-    <div class="add-project"><button class="btn">+</button>Dự án mới</div>
-      <input type="text" placeholder="Nhập dự án cần tìm" />
+      <div class="add-project"><button class="btn">+</button>Dự án mới</div>
+      <input type="text" style="color: black" placeholder="Nhập dự án cần tìm" />
       <button class="btn">A-Z</button>
     </div>
 
@@ -18,17 +18,20 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(project, index) in projects" :key="index">
-          <td><div class="dot"></div></td>
-          <td>{{ project.name }}</td>
-          <td>{{ project.surveys }}</td>
-          <td>{{ project.modified }}</td>
-          <td>{{ project.owner }}</td>
-          <td>...</td>
+        <tr class="project-row" v-for="(project, index) in projects" :key="index">
+            <td>
+              <div class="dot"></div>
+            </td>
+            <td><router-link to="/main/project" class="project-name">{{ project.name }}</router-link></td>
+            <td>{{ project.surveys }}</td>
+            <td>{{ project.modified }}</td>
+            <td>{{ project.owner }}</td>
+            <td>...</td>
         </tr>
       </tbody>
     </table>
   </div>
+
 </template>
 
 <script>
@@ -52,9 +55,9 @@ export default {
   background: linear-gradient(to right, #6a11cb, #2575fc);
   color: white;
   border-radius: 10px;
-  flex: 1;
   width: 100%;
 }
+
 .search-bar {
   display: flex;
   justify-content: center;
@@ -62,31 +65,49 @@ export default {
   gap: 30px;
   font-size: 20px;
 }
-.add-project{
-    display: flex;
-    justify-content: space-between;
-    gap: 5px;
+
+.add-project {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  font-size: 30px;
 }
+
 .search-bar input {
   padding: 8px;
   border-radius: 10px;
   width: 500px;
 }
+
 .btn {
-  padding:10px;
+  padding: 10px;
   background: white;
+  color: black;
   border: none;
   border-radius: 10px;
 }
+
 .project-table {
   width: 100%;
   border-collapse: collapse;
-  text-align:center;
+  text-align: center;
+  font-size: 22px;
 }
-.project-table th, .project-table td {
+
+.project-table th,
+.project-table td {
   padding: 10px;
   border-bottom: 1px solid white;
 }
+.project-name {
+  text-decoration: none;
+  color: white;
+}
+
+.project-name:hover {
+  color: pink;
+}
+
 .dot {
   width: 10px;
   height: 10px;
