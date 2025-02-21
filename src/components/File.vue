@@ -9,9 +9,9 @@
             <div class="sidebar">
                 <h2>Projects 1</h2>
                 <router-link to="/main/project">
-                    <button class="sidebar-btn">Phiếu khảo sát</button>
+                    <button class="sidebar-btn">📋 Phiếu khảo sát</button>
                 </router-link>
-                <button class="sidebar-btn active">Tài liệu</button>
+                <button class="sidebar-btn active">📁 Tài liệu</button>
             </div>
 
             <!-- Content -->
@@ -197,15 +197,15 @@ body {
 /* Sidebar */
 .sidebar {
     width: 25%;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 16px;
+    background: white;
+    padding: 12px;
     border-radius: 8px;
     color: #6a11cb;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar h2 {
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
     margin-bottom: 16px;
 }
@@ -215,7 +215,7 @@ body {
     width: 100%;
     padding: 12px;
     margin-bottom: 8px;
-    background: white;
+    background: #f0f2f5;
     color: #6a11cb;
     border: none;
     border-radius: 8px;
@@ -224,7 +224,6 @@ body {
     transition: background 0.3s;
     cursor: pointer;
 }
-
 .sidebar-btn:hover {
     background: rgba(106, 17, 203, 0.1);
 }

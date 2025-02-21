@@ -6,7 +6,7 @@
                 <span class="user-name">Chí Thiên</span>
                 <div class="user-avatar">
                     <img src="avatar-placeholder" alt="avatar"> Thêm ảnh thực tế -->
-                <!-- </div>
+        <!-- </div>
             </div>
         </div>
 
@@ -49,15 +49,15 @@
                         <div v-for="survey in project.surveys" :key="survey.id" class="survey-card">
                             <router-link to="/main/project/form">
                                 <div class="card-header">
-                                <h4>{{ survey.name }}</h4>
-                                <div class="card-actions">
-                                    <button class="icon-btn">⋮</button>
+                                    <h4>{{ survey.name }}</h4>
+                                    <div class="card-actions">
+                                        <button class="icon-btn">⋮</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="card-stats">
-                                <span>📩 {{ survey.responses }} phản hồi</span>
-                            </div>
-                        </router-link>
+                                <div class="card-stats">
+                                    <span>📩 {{ survey.responses }} phản hồi</span>
+                                </div>
+                            </router-link>
                         </div>
                     </div>
                 </div>
@@ -161,33 +161,30 @@ export default {
 
 /* Content area */
 .content-wrapper {
-    border-radius: 14px;
+    border-radius: 10px;
     background: linear-gradient(to right, #6a11cb, #2575fc);
     flex: 1;
     display: flex;
-    min-height: 0;
-    padding: 0 2rem 2rem;
+    padding: 16px;
+    height: 80vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 250px;
+    width: 25%;
     background: #ffffff;
-    margin: 1rem 0;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    height: calc(100vh - 160px);
-    overflow-y: auto;
+    padding: 12px;
 }
 
-.sidebar-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #eee;
-}
+.sidebar-header {}
 
-.sidebar-menu {
-    padding: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.sidebar-header h2 {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #6a11cb;
 }
 
 .sidebar-menu button {
@@ -214,11 +211,10 @@ export default {
 .main-content {
     flex: 1;
     background: #ffffff;
-    margin: 1rem 0 1rem 1rem;
+    margin: 0 0 0 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
-    height: calc(100vh - 160px);
     display: flex;
     flex-direction: column;
 }
@@ -300,39 +296,6 @@ export default {
     min-height: 0;
     overflow: auto;
     padding: 4px;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-    .survey-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .sidebar {
-        width: 200px;
-    }
-}
-
-@media (max-width: 768px) {
-    .content-wrapper {
-        flex-direction: column;
-        padding: 0 1rem 1rem;
-    }
-
-    .sidebar {
-        width: 100%;
-        height: auto;
-        margin: 1rem 0 0;
-    }
-
-    .main-content {
-        margin: 1rem 0;
-        height: auto;
-    }
-
-    .survey-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 .survey-card {

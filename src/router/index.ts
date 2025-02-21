@@ -26,7 +26,7 @@ const router = createRouter({
     {
       path: '/main/project',
       name: 'project',
-      component: import('../components/Survey.vue'),
+      component: ProjectPage,
       meta: { breadcrumb: "Dự án"}
     },
     {
