@@ -3,12 +3,6 @@
         <SurveyComponent/>
     </div>
 </template>
-<script>
+<script setup>
 import SurveyComponent from "../components/Survey.vue";
-export default {
-    name: "ProjectPage",
-    component: {
-        SurveyComponent,
-    }
-};
 </script>
