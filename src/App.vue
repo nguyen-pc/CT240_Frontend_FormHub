@@ -4,7 +4,7 @@ import HeaderComponent from "./components/Header.vue";
 
 <template>
   <div class="container">
-       <HeaderComponent v-if="!$route.meta.hideHeader"/>
+    <HeaderComponent v-if="!$route.meta.hideHeader" />
     <router-view />
   </div>
 </template>
