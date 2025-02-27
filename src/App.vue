@@ -5,7 +5,7 @@ import ProjectDialog from "./components/ProjectDialog.vue";
 
 <template>
   <div class="container">
-       <HeaderComponent v-if="!$route.meta.hideHeader"/>
+    <HeaderComponent v-if="!$route.meta.hideHeader" />
     <router-view />
     <ProjectDialog/>
   </div>
