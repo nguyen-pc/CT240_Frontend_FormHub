@@ -14,6 +14,7 @@
         <SignInForm />
         <p>{{ message }}</p>
      
+      <div style="margin-bottom: 10px;">Đã có tài khoản?</div>
         <button class="btn_login">Đăng Nhập</button>
         </div>
       </div>
