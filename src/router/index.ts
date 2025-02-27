@@ -35,7 +35,7 @@ const router = createRouter({
       name: 'form-result',
       component: ResultPage,
       meta: { breadcrumb: "Phản hồi"}
-    }
+    },
   ]
 })
 export default router
