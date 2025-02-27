@@ -48,6 +48,7 @@ const closeDialog = () => {
 const useProject = useProjectStore();
 const useForm = useFormStore();
 const newData = ref('');
+const newDescription = ref('');
 // Lấy ngày hiện tại DD/MM/YYYY
 const getCurrentDate = () => {
     const today = new Date();
@@ -64,7 +65,8 @@ const handleSubmit = () => {
             name: newData.value,
             surveys: 0,
             modified: getCurrentDate(),
-            owner: "ncthien2805@gmail.com"
+            owner: "ncthien2805@gmail.com",
+            description: newDescription.value
         })
     }
     if (title.value === 'khảo sát') {
