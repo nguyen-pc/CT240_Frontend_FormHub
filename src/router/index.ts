@@ -37,6 +37,20 @@ const router = createRouter({
       name: 'form-result',
       component: ResultPage,
       meta: { breadcrumb: "Phản hồi"}
+    },
+    {
+      path: '/signin',
+      name: 'signin',
+      component: SignIn,
+      //hide header
+       meta: { hideHeader: true }
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignUp,
+       //hide header
+       meta: { hideHeader: true }
     }
   ]
 })
