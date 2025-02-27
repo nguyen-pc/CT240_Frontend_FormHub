@@ -20,31 +20,31 @@ const router = createRouter({
       path: '/',
       name: 'main',
       component: MainPage,
-      meta: { breadcrumb: 'Trang chủ', requiresAuth: true }
+      meta: { breadcrumb: 'Trang chủ' }
     },
     {
       path: '/main/project',
       name: 'project',
       component: ProjectPage,
-      meta: { breadcrumb: 'Dự án', requiresAuth: true }
+      meta: { breadcrumb: 'Dự án' }
     },
     {
       path: '/main/project/file',
       name: 'project-file',
       component: import('../components/File.vue'),
-      meta: { breadcrumb: 'Tài liệu', requiresAuth: true }
+      meta: { breadcrumb: 'Tài liệu' }
     },
     {
       path: '/main/project/form',
       name: 'form',
       component: FormPage,
-      meta: { breadcrumb: 'Khảo sát', requiresAuth: true }
+      meta: { breadcrumb: 'Khảo sát' }
     },
     {
       path: '/main/project/form/result',
       name: 'form-result',
       component: ResultPage,
-      meta: { breadcrumb: 'Phản hồi', requiresAuth: true }
+      meta: { breadcrumb: 'Phản hồi' }
     },
 
     {
@@ -57,6 +57,7 @@ const router = createRouter({
   ]
 })
 
+// requiresAuth: true
 
 router.beforeResolve(async (to, from, next) => {
   const authStore = useAuthStore()
@@ -70,4 +71,3 @@ router.beforeResolve(async (to, from, next) => {
   }
 })
 export default router
-
