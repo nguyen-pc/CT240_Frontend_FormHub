@@ -29,6 +29,7 @@
     "filepond-plugin-image-preview": "^4.6.12",
     "lucide-vue-next": "^0.475.0",
     "pinia": "^2.1.7",
+    "vee-validate": "^4.15.0",
     "reka-ui": "^2.0.0",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",

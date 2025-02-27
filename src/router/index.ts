@@ -3,6 +3,8 @@ import MainPage from '../views/MainPage.vue'
 import ProjectPage from '../views/ProjectPage.vue'
 import FormPage from '../views/FormPage.vue'
 import ResultPage from '../views/ResultPage.vue'
+import SignIn from '../views/SignIn.vue'
+import SignUp from '../views/SignUp.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -35,7 +37,7 @@ const router = createRouter({
       name: 'form-result',
       component: ResultPage,
       meta: { breadcrumb: "Phản hồi"}
-    },
+    }
   ]
 })
 export default router
