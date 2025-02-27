@@ -14,6 +14,7 @@ import { authentication } from './plugins/authetication'
 
 const app = createApp(App)
 
+
 app.use(createPinia())
 
 authentication.install().then(() => {

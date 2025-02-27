@@ -4,15 +4,9 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import DashboardComponent from "../components/Dashboard.vue";
 
-export default {
-  name: "MainPage",
-  components: {
-    DashboardComponent
-  }
-};
 </script>
 
 <style scoped>

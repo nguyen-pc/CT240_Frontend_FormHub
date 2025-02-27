@@ -57,6 +57,7 @@ const router = createRouter({
   ]
 })
 
+
 router.beforeResolve(async (to, from, next) => {
   const authStore = useAuthStore()
 
@@ -69,3 +70,4 @@ router.beforeResolve(async (to, from, next) => {
   }
 })
 export default router
+
