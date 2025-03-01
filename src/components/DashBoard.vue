@@ -25,28 +25,54 @@
           <td>
             <div class="dot"></div>
           </td>
-          <td><router-link to="/main/project" class="project-name">{{ project.name }}</router-link></td>
-          <td>{{ project.surveys }}</td>
-          <td>{{ project.modified }}</td>
-          <td>{{ project.owner }}</td>
+          <td class="project-name">
+            <router-link :to="`/main/project/${project.projectId}`" class="project-name">
+              {{ project.projectName }}
+            </router-link>
+            <!-- {{ project.projectName }} -->
+          </td>
+          <td>{{ project.surveys.length }}</td>
+          <td>{{ project.createdAt }}</td>
+          <td>{{ project.createdBy }}</td>
           <td>...</td>
         </tr>
       </tbody>
     </table>
   </div>
-
 </template>
 
 <script setup>
-import { useDialogStore,useProjectStore } from "../stores/store";
+import { ProjectStore } from "@/stores/project";
+import { useDialogStore } from "../stores/store";
 import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { onMounted } from "vue";
 const dialogStore = useDialogStore();
+const useProjectStore = ProjectStore();
+const router = useRouter();
+const route = useRoute();
 
-const openProjectDialog = () => {
+const openProjectDialog = async () => {
   dialogStore.openDialog("dự án", { name: "", description: "" });
+
+  await fetchProjects(); // Gọi lại API để cập nhật danh sách
 };
-const projectStore = useProjectStore();
-const  projects  = computed (() => projectStore.projects)
+
+const fetchProjects = async () => {
+  try {
+    await useProjectStore.getAllProjects();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+onMounted(fetchProjects); // const projectStore = useProjectStore();
+const projects = computed(() => useProjectStore.projects);
+console.log("All project", projects);
+
+const projectID = (projectId) => {
+  router.push({ name: "project", params: { id: projectId } });
+};
 </script>
 
 <style scoped>
@@ -57,7 +83,7 @@ const  projects  = computed (() => projectStore.projects)
   border-radius: 10px;
   width: 100%;
 }
-.board-header{
+.board-header {
   display: flex;
   margin-bottom: 15px;
 }
@@ -106,6 +132,7 @@ const  projects  = computed (() => projectStore.projects)
 
 .project-name:hover {
   color: pink;
+  cursor: pointer;
 }
 
 .dot {

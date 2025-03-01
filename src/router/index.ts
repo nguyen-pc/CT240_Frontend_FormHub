@@ -23,7 +23,7 @@ const router = createRouter({
       meta: { breadcrumb: 'Trang chủ' }
     },
     {
-      path: '/main/project',
+      path: '/main/project/:id',
       name: 'project',
       component: ProjectPage,
       meta: { breadcrumb: 'Dự án' }

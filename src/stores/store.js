@@ -16,6 +16,7 @@ export const useDialogStore = defineStore('dialog', () => {
     isOpen.value = false
   }
 
+
   return { isOpen, title, data, openDialog, closeDialog }
 })
 
