@@ -1,17 +1,5 @@
 <template>
     <div class="project-detail">
-        <!-- <div class="header-info">
-            <h1 id="logoName">FORM HUB</h1>
-            <div class="user-info">
-                <span class="user-name">Chí Thiên</span>
-                <div class="user-avatar">
-                    <img src="avatar-placeholder" alt="avatar"> Thêm ảnh thực tế -->
-        <!-- </div>
-            </div>
-        </div>
-
-        <div class="breadcrumb">Trang chủ > Project 1</div> -->
-
         <div class="content-wrapper">
             <div class="sidebar">
                 <div class="sidebar-header">
@@ -32,7 +20,7 @@
                         <button class="btn">
                             <i class="fas fa-search"></i>
                         </button>
-                        <button class="search-btn">+</button>
+                        <button @click="openProjectDialog" class="btn">+ Thêm khảo sát</button>
                     </div>
                     <select class="sort-select">
                         <option>A - Z</option>
@@ -44,9 +32,9 @@
                 </div>
 
                 <div class="survey-board">
-                    <h3 class="board-title">Danh sách phiếu khảo sát (7)</h3>
+                    <h3 class="board-title">Danh sách phiếu khảo sát ({{ surveys.length }})</h3>
                     <div class="survey-grid">
-                        <div v-for="survey in project.surveys" :key="survey.id" class="survey-card">
+                        <div v-for="survey in surveys" :key="survey.id" class="survey-card">
                             <router-link to="/main/project/form">
                                 <div class="card-header">
                                     <h4>{{ survey.name }}</h4>
@@ -65,25 +53,16 @@
         </div>
     </div>
 </template>
-<script>
-export default {
-    name: "SurveyComponent",
-    data() {
-        return {
-            project: {
-                surveys: [
-                    { id: 1, name: "Form 1", responses: 3 },
-                    { id: 2, name: "Form 2", responses: 115 },
-                    { id: 3, name: "Form 3", responses: 7 },
-                    { id: 4, name: "Form 4", responses: 7 },
-                    { id: 5, name: "Form 5", responses: 7 },
-                    { id: 6, name: "Form 6", responses: 115 },
-                    { id: 7, name: "Form 7", responses: 7 }
-                ],
-            },
-        };
-    },
+<script setup>
+import { useDialogStore, useFormStore } from "../stores/store";
+import { computed } from 'vue'
+const dialogStore = useDialogStore();
+
+const openProjectDialog = () => {
+    dialogStore.openDialog("khảo sát", { name: "", description: "" });
 };
+const formStore = useFormStore();
+const surveys = computed(() => formStore.forms.surveys);
 </script>
 
 
@@ -299,6 +278,7 @@ export default {
 }
 
 .survey-card {
+    text-decoration: none;
     background: #ffffff;
     border: 1px solid #eee;
     border-radius: 8px;

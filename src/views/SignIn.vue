@@ -10,11 +10,11 @@
     <div class="right-section">
       <div class="form-container">
         <div class="page">
-        <h3 >ĐĂNG NHẬP</h3>  
-        <SignInForm />
-        <p>{{ message }}</p>
-        <p>Chưa có tài khoản?</p>
-        <button class="btn_login">Đăng ký</button>
+          <h3>ĐĂNG NHẬP</h3>
+          <SignInForm />
+          <p>{{ message }}</p>
+          <p>Chưa có tài khoản?</p>
+          <button @click="register" class="btn_login">Đăng ký</button>
         </div>
       </div>
     </div>
@@ -25,7 +25,13 @@
 import SignInForm from "@/components/SignInForm.vue";
 export default {
   components: {
-    SignInForm
+    SignInForm,
+  },
+
+  methods: {
+    register() {
+      this.$router.replace({ name: "signup" });
+    },
   },
 };
 </script>
@@ -131,7 +137,8 @@ h3 {
     padding: 20px;
   }
 
-  .left-section, .right-section {
+  .left-section,
+  .right-section {
     flex: none;
     width: 100%;
     padding: 20px;
@@ -163,5 +170,4 @@ h3 {
     font-size: 0.9em;
   }
 }
-
 </style>

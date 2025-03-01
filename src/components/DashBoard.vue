@@ -1,11 +1,14 @@
 <template>
   <div class="dashboard">
-    <div class="search-bar">
-      <div class="add-project"><button class="btn">+</button>Dự án mới</div>
-      <input type="text" style="color: black" placeholder="Nhập dự án cần tìm" />
-      <button class="btn">A-Z</button>
+    <div class="board-header">
+      <div class="search-bar">
+        <input type="text" style="color: black" placeholder="Nhập dự án cần tìm" />
+        <button class="btn">A-Z</button>
+      </div>
+      <div class="add-project">
+        <button @click="openProjectDialog" class="btn">+ Dự án mới</button>
+      </div>
     </div>
-
     <table class="project-table">
       <thead>
         <tr>
@@ -19,14 +22,14 @@
       </thead>
       <tbody>
         <tr class="project-row" v-for="(project, index) in projects" :key="index">
-            <td>
-              <div class="dot"></div>
-            </td>
-            <td><router-link to="/main/project" class="project-name">{{ project.name }}</router-link></td>
-            <td>{{ project.surveys }}</td>
-            <td>{{ project.modified }}</td>
-            <td>{{ project.owner }}</td>
-            <td>...</td>
+          <td>
+            <div class="dot"></div>
+          </td>
+          <td><router-link to="/main/project" class="project-name">{{ project.name }}</router-link></td>
+          <td>{{ project.surveys }}</td>
+          <td>{{ project.modified }}</td>
+          <td>{{ project.owner }}</td>
+          <td>...</td>
         </tr>
       </tbody>
     </table>
@@ -34,19 +37,16 @@
 
 </template>
 
-<script>
-export default {
-  name: "DashboardComponent",
-  data() {
-    return {
-      projects: [
-        { name: "Projects 1", surveys: 4, modified: "15/02/2025", owner: "ncthien2805@gmail.com" },
-        { name: "Projects 2", surveys: 15, modified: "01/02/2025", owner: "phapchau@gmail.com" },
-        { name: "Projects 3", surveys: 1, modified: "02/02/2025", owner: "ncthien2805@gmail.com" },
-      ],
-    };
-  },
+<script setup>
+import { useDialogStore,useProjectStore } from "../stores/store";
+import { computed } from "vue";
+const dialogStore = useDialogStore();
+
+const openProjectDialog = () => {
+  dialogStore.openDialog("dự án", { name: "", description: "" });
 };
+const projectStore = useProjectStore();
+const  projects  = computed (() => projectStore.projects)
 </script>
 
 <style scoped>
@@ -57,18 +57,18 @@ export default {
   border-radius: 10px;
   width: 100%;
 }
-
+.board-header{
+  display: flex;
+  margin-bottom: 15px;
+}
 .search-bar {
   display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
+  margin: auto;
   gap: 30px;
   font-size: 20px;
 }
 
 .add-project {
-  display: flex;
-  justify-content: space-between;
   gap: 5px;
   font-size: 30px;
 }

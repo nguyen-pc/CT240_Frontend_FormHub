@@ -10,8 +10,14 @@ import 'bootstrap'
 import Vue3Toasity, { type ToastContainerOptions } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import router from './router'
+import { authentication } from './plugins/authetication'
 
 const app = createApp(App)
 
-app.use(router)
-app.mount('#app')
+
+app.use(createPinia())
+
+authentication.install().then(() => {
+  app.use(router)
+  app.mount('#app')
+})

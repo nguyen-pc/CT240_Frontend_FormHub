@@ -6,7 +6,7 @@
                     <h2>Form 1</h2>
                 </div>
                 <div class="sidebar-menu">
-                    <button v-for="question in form.questions" :key="question.id" :class="{ active: question.active }"
+                    <button v-for="question in questions" :key="question.id" :class="{ active: question.active }"
                         @click="setActiveQuestion(question.id)">
                         {{ question.title }}
                     </button>
@@ -15,20 +15,24 @@
             <div class="main-content">
                 <div class="action-bar">
                     <div class="add-question">
-                        <button class="btn">+</button>
-                        Câu hỏi mới
+                        <button class="btn">+ Thêm câu hỏi</button>
                     </div>
                     <div class="get-link">
                         <button class="btn" @click="getCurrentURL">Sao chép đường dẫn</button>
                     </div>
                 </div>
-                <div class="question-content">
-                    <div v-if="activeQuestion">
-                        <h4>{{ activeQuestion.title }}</h4>
-                        <div class="question-box">
-                            <input class="description" type="text" placeholder="Mô tả" />
-                            <input class="answer" type="text" placeholder="Điền câu trả lời của bạn ở đây">
+                <div class="d-flex">
+                    <div class="question-content">
+                        <div v-if="activeQuestion">
+                            <h4>{{ activeQuestion.title }}</h4>
+                            <div class="question-box">
+                                <input class="description" type="text" placeholder="Mô tả" />
+                                <input class="answer" type="text" placeholder="Điền câu trả lời của bạn ở đây">
+                            </div>
                         </div>
+                    </div>
+                    <div class="">
+                        
                     </div>
                 </div>
                 <button class="btn">Lưu</button>
@@ -37,34 +41,13 @@
 
     </div>
 </template>
-<script>
-import HeaderComponent from "../components/Header.vue";
-export default {
-    name: "FormPage",
-    component: {
-        HeaderComponent
-    },
-    data() {
-        return {
-            form: {
-                questions: [
-                    { id: 1, title: "Question 1", description: "", type: "short-answer", active: true, require: false, maxLength: "", answer: "" },
-                    { id: 2, title: "Question 2", description: "", type: "short-answer", active: false, require: false, maxLength: "", answer: "" },
-                ]
-            }
-        };
-    },
-    computed: {
-        activeQuestion() {
-            return this.form.questions.find(q => q.active);
-        }
-    },
-    methods: {
-        setActiveQuestion(id) {
-            this.form.questions.forEach(q => q.active = (q.id === id));
-        }
-    }
-};
+<script setup>
+import { storeToRefs } from 'pinia';
+import { useQuestionStore } from '../stores/store';
+
+const questionStore = useQuestionStore();
+const {setActiveQuestion} = questionStore;
+const { questions, activeQuestion, } = storeToRefs(questionStore);
 </script>
 <style scoped>
 /* Content area */

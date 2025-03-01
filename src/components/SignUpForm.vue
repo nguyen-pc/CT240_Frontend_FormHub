@@ -1,39 +1,74 @@
 <template>
   <Form @submit="submitForm">
     <div class="form-group">
-      <Field name="username" type="text" class="form-control" placeholder="Nhập tên đăng nhập" />
+      <Field
+        name="username"
+        type="text"
+        class="form-control"
+        placeholder="Nhập tên đăng nhập"
+      />
     </div>
 
     <div class="form-group">
-      <Field name="password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+      <Field name="email" type="text" class="form-control" placeholder="Nhập email" />
     </div>
 
     <div class="form-group">
-      <Field name="confirmPassword" type="password" class="form-control" placeholder="Nhập lại mật khẩu" />
+      <Field
+        name="password"
+        type="password"
+        class="form-control"
+        placeholder="Nhập mật khẩu"
+      />
     </div>
-    
+
     <div class="form-group">
-      <button class="btn_login" type="submit">
-        Đăng Ký
-      </button>
+      <Field
+        name="confirmPassword"
+        type="password"
+        class="form-control"
+        placeholder="Nhập lại mật khẩu"
+      />
+    </div>
+
+    <div class="form-group">
+      <button class="btn_login" type="submit">Đăng Ký</button>
     </div>
   </Form>
 </template>
 
 <script>
-import { Form, Field } from 'vee-validate'; // Đảm bảo import đúng
+import { useAuthStore } from "@/stores/auth";
+import { Form, Field } from "vee-validate"; // Đảm bảo import đúng
 
 export default {
   components: {
     Form,
-    Field
+    Field,
   },
   methods: {
-    submitForm(values) {
+    async submitForm(values) {
+      const authStore = useAuthStore();
       // Xử lý khi form được submit, values chứa các giá trị từ các trường
-      console.log(values);
-    }
-  }
+      if (values.password !== values.confirmPassword) {
+        console.log("Vui long nhap lai");
+      } else {
+        const payload = {
+          name: values.username,
+          email: values.email,
+          password: values.password,
+        };
+        await authStore
+          .register(payload)
+          .then(() => {
+            this.$router.replace({ name: "signin" });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+  },
 };
 </script>
 
