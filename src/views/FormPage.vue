@@ -54,6 +54,17 @@ import { useRoute, useRouter } from "vue-router";
 const questionStore = useQuestionStore();
 const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion } = storeToRefs(questionStore);
+
+const getCurrentURL = async () => {
+  try {
+    let currentURL = window.location.href;
+    currentURL = currentURL + "/question/all";
+    await navigator.clipboard.writeText(currentURL);
+    console.log(currentURL);
+  } catch (error) {
+    console.error("Lỗi khi sao chép đường dẫn: ", error);
+  }
+};
 </script>
 <style scoped>
 /* Content area */

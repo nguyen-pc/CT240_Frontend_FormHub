@@ -32,7 +32,9 @@
           <h3 class="board-title">Danh sách phiếu khảo sát ({{ surveys.length }})</h3>
           <div class="survey-grid">
             <div v-for="survey in surveys" :key="survey.id" class="survey-card">
-              <router-link to="/main/project/form">
+              <router-link
+                :to="`/main/project/${route.params.id}/survey/${survey.surveyId}`"
+              >
                 <div class="card-header">
                   <h4>{{ survey.surveyName }}</h4>
                   <div class="card-actions">
