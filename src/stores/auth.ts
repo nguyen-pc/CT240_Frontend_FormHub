@@ -99,6 +99,7 @@ export const useAuthStore = defineStore('auth', {
     async register(payload: RegisterData) {
       try {
         const { data } = await useApi().post(`/auth/register`, payload)
+        
       } catch (e: Error | any) {
         throw e.message
       }
