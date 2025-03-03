@@ -31,8 +31,46 @@
                             </div>
                         </div>
                     </div>
+                    <div class="option">
+                        <Combobox v-model="value" by="label">
+                            <ComboboxAnchor as-child>
+                                <ComboboxTrigger as-child>
+                                    <Button variant="outline" class="justify-between">
+                                        {{ value?.label ?? 'Chọn loại câu hỏi' }}
+
+                                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </ComboboxTrigger>
+                            </ComboboxAnchor>
+
+                            <ComboboxList>
+                                <div class="relative w-full max-w-sm items-center">
+                                    <ComboboxInput class="pl-9 focus-visible:ring-0 border-0 border-b rounded-none h-10"
+                                        placeholder="Select framework..." />
+                                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
+                                        <Search class="size-4 text-muted-foreground" />
+                                    </span>
+                                </div>
+
+                                <ComboboxEmpty>
+                                    No framework found.
+                                </ComboboxEmpty>
+
+                                <ComboboxGroup>
+                                    <ComboboxItem v-for="framework in questionType" :key="framework.value"
+                                        :value="framework">
+                                        {{ framework.label }}
+
+                                        <ComboboxItemIndicator>
+                                            <Check :class="cn('ml-auto h-4 w-4')" />
+                                        </ComboboxItemIndicator>
+                                    </ComboboxItem>
+                                </ComboboxGroup>
+                            </ComboboxList>
+                        </Combobox>
+                    </div>
                     <div class="">
-                        
+
                     </div>
                 </div>
                 <button class="btn">Lưu</button>
@@ -44,10 +82,17 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { useQuestionStore } from '../stores/store';
-
+import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxList, ComboboxTrigger } from '@/components/ui/combobox'
 const questionStore = useQuestionStore();
-const {setActiveQuestion} = questionStore;
+const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion, } = storeToRefs(questionStore);
+
+
+const questionType = [
+    { value: 'Câu trả lời ngắn', label: 'Câu trả lời ngắn' },
+    { value: 'Trắc nghiệm', label: 'Trắc nghiệm' },
+    { value: 'File', label: 'File' }
+]
 </script>
 <style scoped>
 /* Content area */
@@ -134,8 +179,7 @@ const { questions, activeQuestion, } = storeToRefs(questionStore);
 }
 
 .option {
-    border-radius: 20px;
-    margin-bottom: 5px;
+    margin: 0 auto;
 
 }
 
