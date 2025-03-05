@@ -6,12 +6,8 @@
           <h2>Form 1</h2>
         </div>
         <div class="sidebar-menu">
-          <button
-            v-for="question in questions"
-            :key="question.id"
-            :class="{ active: question.active }"
-            @click="setActiveQuestion(question.id)"
-          >
+          <button v-for="question in questions" :key="question.id" :class="{ active: question.active }"
+            @click="setActiveQuestion(question.id)">
             {{ question.title }}
           </button>
         </div>
@@ -19,7 +15,7 @@
       <div class="main-content">
         <div class="action-bar">
           <div class="add-question">
-            <button class="btn">+ Thêm câu hỏi</button>
+            <button @click="addQuestion" class="btn">+ Thêm câu hỏi</button>
           </div>
           <div class="get-link">
             <button class="btn" @click="getCurrentURL">Sao chép đường dẫn</button>
@@ -30,30 +26,60 @@
             <div v-if="activeQuestion">
               <h4>{{ activeQuestion.title }}</h4>
               <div class="question-box">
-                <input class="description" type="text" placeholder="Mô tả" />
-                <input
-                  class="answer"
-                  type="text"
-                  placeholder="Điền câu trả lời của bạn ở đây"
-                />
+                <input v-model="questionName" class="name" type="text" placeholder="Nhập tiêu đề cho câu hỏi" />
+                <div v-if="questionType === 'multiple-choice'" class="choices d-flex flex-column">
+                  <button @click="addChoice" class="btn">+ Thêm tùy chọn đáp án</button>
+                  <div v-for="choice in activeQuestion.choices" :key="choice.id">
+                    <input v-model="choice.name"/>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class=""></div>
+          <QuestionOption v-model:type="questionType" @update:type="updateType" />
         </div>
-        <button class="btn">Lưu</button>
+        <!-- <button type="submit" class="btn">Lưu</button> -->
       </div>
     </div>
   </div>
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
+import { ref, watch } from "vue";
 import { useQuestionStore } from "../stores/store";
-import { useRoute, useRouter } from "vue-router";
-
+import QuestionOption from "@/components/QuestionOption.vue"
+import QuestionBox from "@/components/QuestionBox.vue";
 const questionStore = useQuestionStore();
 const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion } = storeToRefs(questionStore);
+const addQuestion = () => {
+  questionStore.addQuestion()
+};
+const addChoice = () => {
+  questionStore.addChoice()
+};
+// Tạo `ref` theo dõi: Question name là tên (nội dung) câu hỏi, question type là loại câu hỏi
+// Cả 2 đại diện cho khung câu hỏi hiển thị
+const questionName = ref(activeQuestion?.value?.name || '');
+const questionType = ref(activeQuestion?.value?.type || '');
+// Cập nhật giá trị name của câu hỏi khi thay đổi
+watch(questionName, (newName) => {
+  activeQuestion.value.name = newName;
+})
+// Cập nhật giá trị type của câu hỏi khi thay đổi
+watch(questionType, (newType) => {
+  activeQuestion.value.type = newType;
+});
+
+watch(activeQuestion, (newQuestion) => {
+  //Cập nhật giá trị đúng question box khi chuyển sang câu khác
+  questionName.value = newQuestion.name;
+  questionType.value = newQuestion.type;
+}, { deep: true });
+
+const updateType = (value) => {
+  questionType.value = value;
+}
 </script>
 <style scoped>
 /* Content area */
@@ -124,6 +150,7 @@ const { questions, activeQuestion } = storeToRefs(questionStore);
   border-radius: 10px;
   cursor: pointer;
   padding: 10px;
+  color: black;
 }
 
 .question-box * {
@@ -131,12 +158,17 @@ const { questions, activeQuestion } = storeToRefs(questionStore);
   padding: 5px;
 }
 
-.question-box .description {
-  width: fit-content;
+.question-box .question-title {
+  width: 100%;
 }
 
 .question-box .answer {
   font-size: 25px;
+}
+
+.question-box input {
+  height: fit-content;
+  font-size: 20px;
 }
 
 .option {
@@ -185,5 +217,9 @@ const { questions, activeQuestion } = storeToRefs(questionStore);
   cursor: pointer;
   width: fit-content;
   margin-top: 8px;
+}
+
+.choices {
+  background-color: white;
 }
 </style>
