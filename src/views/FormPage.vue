@@ -9,6 +9,7 @@
           <button v-for="question in questions" :key="question.id" :class="{ active: question.active }"
             @click="setActiveQuestion(question.id)">
             {{ question.title }}
+            <i class="fa fa-trash" @click.stop="deleteQuestion(question.id)"></i>
           </button>
         </div>
       </div>
@@ -30,13 +31,19 @@
                 <div v-if="questionType === 'multiple-choice'" class="choices d-flex flex-column">
                   <button @click="addChoice" class="btn">+ Thêm tùy chọn đáp án</button>
                   <div v-for="choice in activeQuestion.choices" :key="choice.id">
-                    <input v-model="choice.name"/>
+                    <input class="choice" v-model="choice.name" :placeholder="choice.placeholder" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <QuestionOption v-model:type="questionType" @update:type="updateType" />
+          <div class="d-flex flex-column gap-2 optional">
+            <div>
+              <input v-model="activeQuestion.require" id="checkRequired" type="checkbox" /> <label
+                for="checkRequired">Bắt buộc</label>
+            </div>
+            <QuestionOption v-model:type="questionType" @update:type="updateType" />
+          </div>
         </div>
         <!-- <button type="submit" class="btn">Lưu</button> -->
       </div>
@@ -48,7 +55,6 @@ import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import { useQuestionStore } from "../stores/store";
 import QuestionOption from "@/components/QuestionOption.vue"
-import QuestionBox from "@/components/QuestionBox.vue";
 const questionStore = useQuestionStore();
 const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion } = storeToRefs(questionStore);
@@ -75,11 +81,29 @@ watch(activeQuestion, (newQuestion) => {
   //Cập nhật giá trị đúng question box khi chuyển sang câu khác
   questionName.value = newQuestion.name;
   questionType.value = newQuestion.type;
+  //console.log(activeQuestion.value);
 }, { deep: true });
 
 const updateType = (value) => {
   questionType.value = value;
 }
+const deleteQuestion = (id) => {
+  // Logic xóa câu hỏi dựa trên id
+  if(questions.value.length>1){
+    const index = questions.value.findIndex((question) => question.id === id);
+    if (index !== -1) {
+      questions.value.splice(index, 1);
+
+      if (activeQuestion.value && activeQuestion.value.id === id) {
+        let newActiveIndex = index - 1;
+        if (newActiveIndex < 0) {
+          newActiveIndex = 0;
+        }
+        setActiveQuestion(questions.value[newActiveIndex].id);
+      }
+    }
+  }
+};
 </script>
 <style scoped>
 /* Content area */
@@ -127,6 +151,8 @@ const updateType = (value) => {
   text-align: left;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
 }
 
 .sidebar-menu button.active {
@@ -221,5 +247,17 @@ const updateType = (value) => {
 
 .choices {
   background-color: white;
+}
+.choice {
+  width: 100%;
+  border: 1px solid black;
+}
+.optional{
+  margin: 0 auto;
+  width: 180px;
+  font-size: 18px;
+}
+.fa-trash:hover{
+  color: red;
 }
 </style>

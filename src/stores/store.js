@@ -102,9 +102,7 @@ export const useQuestionStore = defineStore('questionStore', () => {
       active: true,
       require: false,
       maxLength: '',
-      choices: [
-        { id: 1, name: 'Tùy chọn 1' }
-      ]
+      choices: [{ id: 1, name: '', placeholder: 'Tùy chọn 1' }]
     },
     {
       id: 2,
@@ -114,7 +112,7 @@ export const useQuestionStore = defineStore('questionStore', () => {
       active: false,
       require: false,
       maxLength: '',
-      choices: [{ id: 1, name: 'Tùy chọn 1' }]
+      choices: [{ id: 1, name: '', placeholder: 'Tùy chọn 1' }]
     }
   ])
 
@@ -132,13 +130,14 @@ export const useQuestionStore = defineStore('questionStore', () => {
       active: false,
       require: false,
       maxLength: '',
-      choices: [{ id: 1, name: 'Tùy chọn 1' }]
+      choices: [{ id: 1, name: '',placeholder: 'Tùy chọn 1'}]
     })
   }
   const addChoice = () => {
     activeQuestion.value.choices.push({
       id: activeQuestion.value.choices.length + 1,
-      name: 'Tùy chọn ' + (activeQuestion.value.choices.length + 1)
+      name: '',
+      placeholder: 'Tùy chọn ' + (activeQuestion.value.choices.length + 1)
     })
   }
   return {

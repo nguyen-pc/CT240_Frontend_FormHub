@@ -1,5 +1,5 @@
 <template>
-    <div class="bar">
+    <div>
         <Popover>
             <PopoverTrigger as-child>
                 <Button variant="outline" class="w-full justify-between">
@@ -55,9 +55,3 @@ watch(() => props.type, (newType) => {
 
 
 </script>
-
-<style scoped>
-    .bar{
-        margin: 0 auto;
-    }
-</style>
