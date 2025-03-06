@@ -30,8 +30,9 @@
                 <input v-model="questionName" class="name" type="text" placeholder="Nhập tiêu đề cho câu hỏi" />
                 <div v-if="questionType === 'multiple-choice'" class="choices d-flex flex-column">
                   <button @click="addChoice" class="btn">+ Thêm tùy chọn đáp án</button>
-                  <div v-for="choice in activeQuestion.choices" :key="choice.id">
+                  <div class="d-flex" v-for="choice in activeQuestion.choices" :key="choice.id">
                     <input class="choice" v-model="choice.name" :placeholder="choice.placeholder" />
+                    <i class="fa fa-trash" @click="deleteChoice(choice.id)"></i>
                   </div>
                 </div>
               </div>
@@ -92,15 +93,22 @@ const deleteQuestion = (id) => {
   if(questions.value.length>1){
     const index = questions.value.findIndex((question) => question.id === id);
     if (index !== -1) {
-      questions.value.splice(index, 1);
-
-      if (activeQuestion.value && activeQuestion.value.id === id) {
-        let newActiveIndex = index - 1;
-        if (newActiveIndex < 0) {
-          newActiveIndex = 0;
-        }
-        setActiveQuestion(questions.value[newActiveIndex].id);
+      if (questions.value[index] === activeQuestion.value) {
+        if (index == 0) questions.value[1].active = true;
+        else questions.value[index - 1].active = true;
       }
+      questions.value.splice(index, 1);
+      
+      questionStore.updateID();
+    }
+  }
+};
+const deleteChoice = (id) => {
+  if (activeQuestion.value?.choices.length > 1) {
+    const index = activeQuestion.value.choices.findIndex((choice) => choice.id === id);
+    if (index !== -1) {
+      activeQuestion.value.choices.splice(index, 1);
+      questionStore.updateChoiceID();
     }
   }
 };
@@ -256,6 +264,9 @@ const deleteQuestion = (id) => {
   margin: 0 auto;
   width: 180px;
   font-size: 18px;
+}
+.fa-trash{
+  margin: auto 0;
 }
 .fa-trash:hover{
   color: red;
