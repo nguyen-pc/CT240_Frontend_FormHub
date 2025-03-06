@@ -60,7 +60,8 @@ const router = createRouter({
       name: 'signin',
       component: SignIn,
       //hide header
-      meta: { hideHeader: true }
+       meta: { hideHeader: true, breadcrumb: 'Phản hồi' },
+
     },
 
     {

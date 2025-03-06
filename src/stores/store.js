@@ -97,22 +97,22 @@ export const useQuestionStore = defineStore('questionStore', () => {
     {
       id: 1,
       title: 'Question 1',
-      description: '',
+      name: '',
       type: 'short-answer',
       active: true,
       require: false,
       maxLength: '',
-      answer: ''
+      choices: [{ id: 1, name: '', placeholder: 'Tùy chọn 1' }]
     },
     {
       id: 2,
       title: 'Question 2',
-      description: '',
+      name: '',
       type: 'short-answer',
       active: false,
       require: false,
       maxLength: '',
-      answer: ''
+      choices: [{ id: 1, name: '', placeholder: 'Tùy chọn 1' }]
     }
   ])
 
@@ -121,10 +121,44 @@ export const useQuestionStore = defineStore('questionStore', () => {
   const setActiveQuestion = (id) => {
     questions.value.forEach((q) => (q.active = q.id === id))
   }
-
+  const addQuestion = () => {
+    questions.value.push({
+      id: questions.value.length + 1,
+      title: `Question ${questions.value.length + 1}`,
+      name: '',
+      type: 'short-answer',
+      active: false,
+      require: false,
+      maxLength: '',
+      choices: [{ id: 1, name: '',placeholder: 'Tùy chọn 1'}]
+    })
+  }
+  const addChoice = () => {
+    activeQuestion.value.choices.push({
+      id: activeQuestion.value.choices.length + 1,
+      name: '',
+      placeholder: 'Tùy chọn ' + (activeQuestion.value.choices.length + 1)
+    })
+  }
+  const updateID = () => {
+    for(let i=0;i<questions.value.length;i++) {
+      questions.value[i].id = i+1;
+      questions.value[i].title = `Question ${i + 1}`;
+    }
+  }
+  const updateChoiceID = () => {
+    for (let i = 0; i < activeQuestion.value.choices.length; i++) {
+      activeQuestion.value.choices[i].id = i + 1
+      activeQuestion.value.choices[i].placeholder = `Tùy chọn ${i + 1}`
+    }
+  }
   return {
     questions,
     activeQuestion,
-    setActiveQuestion
+    setActiveQuestion,
+    addQuestion,
+    addChoice,
+    updateID,
+    updateChoiceID
   }
 })
