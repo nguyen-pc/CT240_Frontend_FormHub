@@ -72,10 +72,7 @@
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
                                                 <span>Xóa</span>
-
                                             </DropdownMenuItem>
-
-
                                         </DropdownMenuGroup>
                                         <DropdownMenuSeparator />
                                     </DropdownMenuContent>
