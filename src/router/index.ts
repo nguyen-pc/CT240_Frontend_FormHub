@@ -39,7 +39,7 @@ const router = createRouter({
       meta: { breadcrumb: 'Tài liệu' }
     },
     {
-      path: '/main/project/form',
+      path: '/main/project/:id/survey/:id',
       name: 'form',
       component: FormPage,
       meta: { breadcrumb: 'Khảo sát' }
@@ -48,10 +48,10 @@ const router = createRouter({
       path: '/main/project/form/result',
       name: 'form-result',
       component: ResultPage,
-      meta: { breadcrumb: "Phản hồi"}
+      meta: { breadcrumb: 'Phản hồi' }
     },
     {
-      path: '/surveyform',
+      path: '/main/project/:projectId/survey/:surveyId/question/all',
       name: 'surveyform',
       component: SurveyForm
     },
@@ -61,6 +61,7 @@ const router = createRouter({
       component: SignIn,
       //hide header
        meta: { hideHeader: true, breadcrumb: 'Phản hồi' },
+
     },
 
     {
