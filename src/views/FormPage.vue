@@ -67,6 +67,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 const questionStore = useQuestionStore();
 const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion } = storeToRefs(questionStore);
+
 const addQuestion = () => {
   questionStore.addQuestion()
 };
@@ -118,6 +119,17 @@ const deleteChoice = (id) => {
       activeQuestion.value.choices.splice(index, 1);
       questionStore.updateChoiceID();
     }
+
+
+const getCurrentURL = async () => {
+  try {
+    let currentURL = window.location.href;
+    currentURL = currentURL + "/question/all";
+    await navigator.clipboard.writeText(currentURL);
+    console.log(currentURL);
+  } catch (error) {
+    console.error("Lỗi khi sao chép đường dẫn: ", error);
+
   }
 };
 </script>

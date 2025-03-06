@@ -58,6 +58,15 @@ export const ProjectStore = defineStore('project', {
       } catch (e: Error | any) {
         throw e.message
       }
+    },
+
+    async deleteProject(projectId: any) {
+      
+      try {
+         await useApiPrivate().delete(`/project/${projectId}`)
+      } catch (e: Error | any) {
+        throw e.message
+      }
     }
   }
 })

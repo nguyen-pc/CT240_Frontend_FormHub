@@ -1,24 +1,29 @@
 <template>
   <div class="container">
-    <h2>{{ survey.title }}</h2>
+    <h2>{{ survey.surveyName }}</h2>
     <form @submit.prevent="submitSurvey">
-      <div v-for="question in survey.questions" :key="question.id" class="question">
-        <p>{{ question.question }}</p>
+      <div v-for="question in questions" :key="question.id" class="question">
+        <p>{{ question.questionName }}</p>
 
         <!-- Câu hỏi nhập liệu -->
-        <input style="background-color: antiquewhite; border-radius: 5px; height: auto;" v-if="question.type === 'text'" v-model="question.answer" type="text" />
+        <input
+          style="background-color: antiquewhite; border-radius: 5px; height: auto"
+          v-if="question.questionType === 'TEXT'"
+          v-model="question.answer"
+          type="text"
+        />
 
         <!-- Câu hỏi trắc nghiệm -->
-        <div v-if="question.type === 'radio'">
-          <label v-for="option in question.options" :key="option">
-            <input type="radio" v-model="question.answer" :value="option" />
-            {{ option }}
+        <div v-if="question.questionType === 'MULTIPLE_CHOICE'">
+          <label v-for="option in question.choices" :key="option.choiceId">
+            <input type="radio" v-model="question.answer" :value="option.choiceId" />
+            {{ option.choiceText }}
           </label>
         </div>
 
         <!-- Câu hỏi checkbox -->
-        <div v-if="question.type === 'checkbox'">
-          <label v-for="option in question.options" :key="option">
+        <div v-if="question.questionType === 'CHECKBOX'">
+          <label v-for="option in question.choices" :key="option">
             <input type="checkbox" :value="option" v-model="question.answer" />
             {{ option }}
           </label>
@@ -28,57 +33,77 @@
       <button type="submit">Gửi khảo sát</button>
     </form>
   </div>
-  <div class="space"> <br></div>
+  <div class="space"><br /></div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      survey: {
-        title: "Khảo sát ý kiến khách hàng",
-        questions: [
-          { id: 1, type: "text", question: "Bạn tên gì?", answer: "" },
-          {
-            id: 2,
-            type: "radio",
-            question: "Bạn thích sản phẩm nào nhất?",
-            options: ["Sản phẩm A", "Sản phẩm B", "Sản phẩm C"],
-            answer: "",
-          },
-          {
-            id: 3,
-            type: "checkbox",
-            question: "Bạn quan tâm đến tính năng nào?",
-            options: ["Giá rẻ", "Chất lượng", "Hỗ trợ khách hàng"],
-            answer: [],
-          },
-          {
-            id: 4,
-            type: "radio",
-            question: "Bạn quan tâm đến tính năng nào?",
-            options: ["Giá rẻ", "Chất lượng", "Hỗ trợ khách hàng"],
-            answer: [],
-          },
-          {
-            id: 5,
-            type: "radio",
-            question: "Bạn quan tâm đến tính năng nào?",
-            options: ["Giá rẻ", "Chất lượng", "Hỗ trợ khách hàng"],
-            answer: [],
-          },
-        ],
-      },
-    };
-  },
-  methods: {
-    submitSurvey() {
-      console.log("Dữ liệu khảo sát:", this.survey.questions);
-      alert("Cảm ơn bạn đã gửi phản hồi!");
-    },
-  },
+<script setup>
+import { useRoute } from "vue-router";
+import { computed, onMounted, ref } from "vue";
+import { SurveyStore } from "@/stores/survey";
+import { useQuestionStore } from "@/stores/question";
+
+const route = useRoute();
+const projectId = route.params.projectId;
+const surveyId = route.params.surveyId;
+
+console.log(projectId, surveyId);
+
+const useSurveyStore = SurveyStore();
+const QuestionStore = useQuestionStore();
+
+const fetchQuestion = async () => {
+  console.log("Fetching question...");
+  try {
+    await QuestionStore.getAllQuestion(projectId, surveyId);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const fetchSurvey = async () => {
+  console.log("Fetching surveys...");
+  try {
+    await useSurveyStore.getSurveyById(projectId, surveyId);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+onMounted(() => {
+  fetchSurvey();
+  fetchQuestion();
+}); // const projectStore = useProjectStore();
+const survey = computed(() => useSurveyStore.surveys);
+const questions = computed(() => QuestionStore.questions);
+console.log("All Question", questions.value);
+
+const submitSurvey = async () => {
+  const answers = questions.value
+    .map((question) => {
+      if (question.questionType === "TEXT") {
+        return { questionId: question.questionId, answerText: question.answer || "" };
+      } else if (question.questionType === "MULTIPLE_CHOICE") {
+        return { questionId: question.questionId, choiceId: question.answer };
+      } else if (question.questionType === "CHECKBOX") {
+        return question.answer.map((choice) => ({
+          questionId: question.questionId,
+          choiceId: choice,
+        }));
+      }
+    })
+    .flat(); // Dùng flat() để xử lý CHECKBOX trả về mảng
+
+  console.log("Submitting answers:", answers);
+  // Goi API xử lí trả lời câu hỏi
+  // try {
+  //   await QuestionStore.submitAnswers({ answers });
+  //   alert("Khảo sát đã được gửi thành công!");
+  // } catch (e) {
+  //   console.error("Lỗi khi gửi khảo sát:", e);
+  // }
 };
 </script>
+
 <style scoped>
 .container {
   width: 70%;
@@ -142,5 +167,4 @@ button {
 button:hover {
   background-color: #45a049;
 }
-
 </style>
