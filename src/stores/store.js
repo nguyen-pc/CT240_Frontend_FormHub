@@ -16,8 +16,40 @@ export const useDialogStore = defineStore('dialog', () => {
     isOpen.value = false
   }
 
-
   return { isOpen, title, data, openDialog, closeDialog }
+})
+
+export const useDialogStoreEdit = defineStore('dialogEdit', () => {
+  const isOpenEdit = ref(false)
+  const titleEdit = ref('')
+  const idEdit = ref()
+  const nameEdit = ref('')
+  const descriptionEdit = ref('')
+  const dataEdit = ref({})
+
+  const openDialogEdit = (dialogTitle, id, name, description) => {
+    titleEdit.value = dialogTitle
+    idEdit.value = id
+    nameEdit.value = name
+    descriptionEdit.value = description
+    isOpenEdit.value = true
+  }
+
+  const closeDialogEdit = () => {
+    isOpenEdit.value = false
+  }
+  console.log('Data Edit', dataEdit.value)
+
+  return {
+    isOpenEdit,
+    titleEdit,
+    idEdit,
+    nameEdit,
+    descriptionEdit,
+    dataEdit,
+    openDialogEdit,
+    closeDialogEdit
+  }
 })
 
 export const useProjectStore = defineStore('projectStore', () => {

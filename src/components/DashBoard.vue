@@ -34,7 +34,33 @@
           <td>{{ project.surveys.length }}</td>
           <td>{{ project.createdAt }}</td>
           <td>{{ project.createdBy }}</td>
-          <td>...</td>
+          <td>
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button variant="outline">...</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent class="w-40">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <span
+                      @click="
+                        openProjectDialogEdit(
+                          project.projectId,
+                          project.projectName,
+                          project.description
+                        )
+                      "
+                      >Sửa thông tin</span
+                    >
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <span @click="deleteProject(project.projectId)">Xóa dự án</span>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -43,11 +69,26 @@
 
 <script setup>
 import { ProjectStore } from "@/stores/project";
-import { useDialogStore } from "../stores/store";
+import { useDialogStore, useDialogStoreEdit } from "../stores/store";
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted } from "vue";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 const dialogStore = useDialogStore();
+const dialogStoreEdit = useDialogStoreEdit();
 const useProjectStore = ProjectStore();
 const router = useRouter();
 const route = useRoute();
@@ -69,6 +110,18 @@ const fetchProjects = async () => {
 onMounted(fetchProjects); // const projectStore = useProjectStore();
 const projects = computed(() => useProjectStore.projects);
 console.log("All project", projects);
+
+const openProjectDialogEdit = async (id, name, description) => {
+  console.log(id, name, description);
+  await dialogStoreEdit.openDialogEdit("dự án", id, name, description);
+
+  await fetchProjects(); // Gọi lại API để cập nhật danh sách
+};
+
+const deleteProject = async (projectId) => {
+  await useProjectStore.deleteProject(projectId);
+  await fetchProjects();
+};
 
 const projectID = (projectId) => {
   router.push({ name: "project", params: { id: projectId } });

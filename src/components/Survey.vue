@@ -3,10 +3,12 @@
     <div class="content-wrapper">
       <div class="sidebar">
         <div class="sidebar-header">
-          <h2>Projects 1</h2>
+          <h2>{{}}</h2>
         </div>
         <div class="sidebar-menu">
-          <button class="active">📋 Phiếu khảo sát</button>
+          <router-link :to="`/main/project/${param}`">
+            <button class="active">📋 Phiếu khảo sát</button>
+          </router-link>
           <router-link to="/main/project/file">
             <button>📁 Tài liệu</button>
           </router-link>
@@ -32,19 +34,46 @@
           <h3 class="board-title">Danh sách phiếu khảo sát ({{ surveys.length }})</h3>
           <div class="survey-grid">
             <div v-for="survey in surveys" :key="survey.id" class="survey-card">
-              <router-link
-                :to="`/main/project/${route.params.id}/survey/${survey.surveyId}`"
-              >
-                <div class="card-header">
-                  <h4>{{ survey.surveyName }}</h4>
-                  <div class="card-actions">
-                    <button class="icon-btn">⋮</button>
-                  </div>
+              <div class="card-header">
+                <router-link
+                  :to="`/main/project/${route.params.id}/survey/${survey.surveyId}`"
+                  ><h4>{{ survey.surveyName }}</h4>
+                </router-link>
+                <div class="card-actions">
+                  <button class="icon-btn">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger as-child>
+                        <Button variant="outline">...</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent class="w-40">
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem class="cursor-pointer">
+                            <span
+                              @click="
+                                openProjectDialogEdit(
+                                  survey.surveyId,
+                                  survey.surveyName,
+                                  survey.description
+                                )
+                              "
+                              >Sửa thông tin</span
+                            >
+                          </DropdownMenuItem>
+                          <DropdownMenuItem class="mt-2 cursor-pointer">
+                            <span @click="deleteSurvey(param, survey.surveyId)"
+                              >Xóa dự án</span
+                            >
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </button>
                 </div>
-                <div class="card-stats">
-                  <span>📩 {{ survey.responses.length }} phản hồi</span>
-                </div>
-              </router-link>
+              </div>
+              <div class="card-stats">
+                <span>📩 {{ survey.responses.length }} phản hồi</span>
+              </div>
             </div>
           </div>
         </div>
@@ -54,15 +83,31 @@
 </template>
 <script setup>
 import { useRoute, useRouter } from "vue-router";
-import { useDialogStore, useFormStore } from "../stores/store";
+import { useDialogStore, useDialogStoreEdit, useFormStore } from "../stores/store";
 import { computed, onMounted } from "vue";
 import { SurveyStore } from "@/stores/survey";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ProjectStore } from "@/stores/project";
 const useSurveyStore = SurveyStore();
+const useProjectStore = ProjectStore();
 const router = useRouter();
 const route = useRoute();
 
 const dialogStore = useDialogStore();
+const dialogStoreEdit = useDialogStoreEdit();
 const param = route.params.id;
 console.log(route.params.id);
 
@@ -79,9 +124,34 @@ const fetchSurvey = async () => {
   }
 };
 
-onMounted(fetchSurvey); // const projectStore = useProjectStore();
+const fetchProject = async () => {
+  try {
+    console.log("Fetching project with ID:", param); // Kiểm tra ID
+    await useProjectStore.getProjectsById(param);
+    console.log("Da fetch xong");
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+onMounted(fetchSurvey);
+onMounted(fetchProject); // const projectStore = useProjectStore();
 const surveys = computed(() => useSurveyStore.surveys);
+const projectById = computed(() => useProjectStore.project);
+console.log("Project By Id", projectById);
 console.log("All survey", surveys);
+
+const deleteSurvey = async (projectId, surveyId) => {
+  await useSurveyStore.deleteSurvey(projectId, surveyId);
+  await fetchSurvey();
+};
+
+const openProjectDialogEdit = async (id, name, description) => {
+  console.log(id, name, description);
+  await dialogStoreEdit.openDialogEdit("Khảo sát", id, name, description);
+
+  await fetchSurvey(); // Gọi lại API để cập nhật danh sách
+};
 </script>
 
 <style scoped>
