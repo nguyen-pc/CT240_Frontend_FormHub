@@ -58,7 +58,28 @@
                             <td>{{ item.modified }}</td>
                             <td>{{ item.size }}</td>
                             <td>
-                                <i class="fas fa-ellipsis-h" @click="openModal(item)"></i>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger as-child>
+                                        <Button variant="outline">
+                                            ...
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent class="w-56">
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuGroup>
+                                            <DropdownMenuItem>
+                                                <span>Sửa</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem>
+                                                <span>Xóa</span>
+
+                                            </DropdownMenuItem>
+
+
+                                        </DropdownMenuGroup>
+                                        <DropdownMenuSeparator />
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </td>
                         </tr>
                     </tbody>
@@ -67,7 +88,7 @@
         </div>
 
         <!-- Modal for Edit/Delete -->
-        <div v-if="isModalOpen" class="modal">
+        <!-- <div v-if="isModalOpen" class="modal">
             <div class="modal-content">
                 <h3>Chọn hành động</h3>
                 <div class="modal-actions">
@@ -76,120 +97,245 @@
                     <button class="modal-btn cancel-btn" @click="closeModal">Đóng</button>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
-<script>
-export default {
-    name: 'FileComponent',
-    data() {
-        return {
-            searchQuery: '',
-            selectedType: '',
-            items: [
-                {
-                    name: 'Folder 1',
-                    owner: 'ncthien2805@gmail.com',
-                    modified: '15/02/2025',
-                    size: '---',
-                    icon: 'fas fa-folder',
-                    type: 'folder'
-                },
-                {
-                    name: 'Folder 2',
-                    owner: 'phapchau@gmail.com',
-                    modified: '01/02/2025',
-                    size: '---',
-                    icon: 'fas fa-folder',
-                    type: 'folder'
-                },
-                {
-                    name: 'Folder 3',
-                    owner: 'ncthien2805@gmail.com',
-                    modified: '02/02/2025',
-                    size: '---',
-                    icon: 'fas fa-folder',
-                    type: 'folder'
-                },
-                {
-                    name: 'search.png',
-                    owner: 'ncthien2805@gmail.com',
-                    modified: '02/02/2025',
-                    size: '4MB',
-                    icon: 'fas fa-file-image',
-                    type: 'png'
-                },
-                {
-                    name: 'work.docx',
-                    owner: 'ncthien2805@gmail.com',
-                    modified: '02/02/2025',
-                    size: '2KB',
-                    icon: 'fas fa-file-word',
-                    type: 'docx'
-                },
-                {
-                    name: 'video.mp4',
-                    owner: 'ncthien2805@gmail.com',
-                    modified: '02/02/2025',
-                    size: '10MB',
-                    icon: 'fas fa-file-video',
-                    type: 'mp4'
-                }
-            ],
-            isModalOpen: false,
-            currentItem: null
-        };
+<script setup>
+import { Button } from '@/components/ui/button'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ref, computed } from 'vue';
+// export default {
+//     name: 'FileComponent',
+//     data() {
+//         return {
+//             searchQuery: '',
+//             selectedType: '',
+//             items: [
+//                 {
+//                     name: 'Folder 1',
+//                     owner: 'ncthien2805@gmail.com',
+//                     modified: '15/02/2025',
+//                     size: '---',
+//                     icon: 'fas fa-folder',
+//                     type: 'folder'
+//                 },
+//                 {
+//                     name: 'Folder 2',
+//                     owner: 'phapchau@gmail.com',
+//                     modified: '01/02/2025',
+//                     size: '---',
+//                     icon: 'fas fa-folder',
+//                     type: 'folder'
+//                 },
+//                 {
+//                     name: 'Folder 3',
+//                     owner: 'ncthien2805@gmail.com',
+//                     modified: '02/02/2025',
+//                     size: '---',
+//                     icon: 'fas fa-folder',
+//                     type: 'folder'
+//                 },
+//                 {
+//                     name: 'search.png',
+//                     owner: 'ncthien2805@gmail.com',
+//                     modified: '02/02/2025',
+//                     size: '4MB',
+//                     icon: 'fas fa-file-image',
+//                     type: 'png'
+//                 },
+//                 {
+//                     name: 'work.docx',
+//                     owner: 'ncthien2805@gmail.com',
+//                     modified: '02/02/2025',
+//                     size: '2KB',
+//                     icon: 'fas fa-file-word',
+//                     type: 'docx'
+//                 },
+//                 {
+//                     name: 'video.mp4',
+//                     owner: 'ncthien2805@gmail.com',
+//                     modified: '02/02/2025',
+//                     size: '10MB',
+//                     icon: 'fas fa-file-video',
+//                     type: 'mp4'
+//                 }
+//             ],
+//             isModalOpen: false,
+//             currentItem: null
+//         };
+//     },
+//     computed: {
+//         filteredItems() {
+//             return this.items.filter(item => {
+//                 const matchesSearch = item.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+//                 const matchesType = this.selectedType ? item.type === this.selectedType : true;
+//                 return matchesSearch && matchesType;
+//             });
+//         }
+//     },
+//     methods: {
+//         openModal(item) {
+//             this.currentItem = item;
+//             this.isModalOpen = true;
+//         },
+//         closeModal() {
+//             this.isModalOpen = false;
+//             this.currentItem = null;
+//         },
+//         editItem() {
+//             if (this.currentItem) {
+//                 const newName = prompt("Nhập tên mới cho tệp:", this.currentItem.name);
+//             }
+//         },
+
+//     },
+//     deleteItem() {
+//         if (this.currentItem) {
+//             const confirmDelete = confirm("Bạn có chắc chắn muốn xóa tệp này không?");
+//             if (confirmDelete) {
+//                 this.items = this.items.filter(item => item !== this.currentItem);
+//             }
+//         }
+//         this.closeModal();
+//     },
+//     addItem() {
+//         const newFolderName = prompt("Nhập tên thư mục mới:");
+//         if (newFolderName) {
+//             this.items.push({
+//                 name: newFolderName,
+//                 owner: 'ncthien2805@gmail.com',
+//                 modified: new Date().toLocaleDateString(),
+//                 size: '---',
+//                 icon: 'fas fa-folder',
+//                 type: 'folder'
+//             });
+//         }
+//     }
+// }
+// ;
+const searchQuery = ref('');
+const selectedType = ref('');
+const items = ref([
+    {
+        name: 'Folder 1',
+        owner: 'ncthien2805@gmail.com',
+        modified: '15/02/2025',
+        size: '---',
+        icon: 'fas fa-folder',
+        type: 'folder',
     },
-    computed: {
-        filteredItems() {
-            return this.items.filter(item => {
-                const matchesSearch = item.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-                const matchesType = this.selectedType ? item.type === this.selectedType : true;
-                return matchesSearch && matchesType;
-            });
-        }
+    {
+        name: 'Folder 2',
+        owner: 'phapchau@gmail.com',
+        modified: '01/02/2025',
+        size: '---',
+        icon: 'fas fa-folder',
+        type: 'folder',
     },
-    methods: {
-        openModal(item) {
-            this.currentItem = item;
-            this.isModalOpen = true;
-        },
-        closeModal() {
-            this.isModalOpen = false;
-            this.currentItem = null;
-        },
-        editItem() {
-            if (this.currentItem) {
-                const newName = prompt("Nhập tên mới cho tệp:", this.currentItem.name);
-            }
-        },
-        
+    {
+        name: 'Folder 3',
+        owner: 'ncthien2805@gmail.com',
+        modified: '02/02/2025',
+        size: '---',
+        icon: 'fas fa-folder',
+        type: 'folder',
     },
-    deleteItem() {
-        if (this.currentItem) {
-            const confirmDelete = confirm("Bạn có chắc chắn muốn xóa tệp này không?");
-            if (confirmDelete) {
-                this.items = this.items.filter(item => item !== this.currentItem);
-            }
-        }
-        this.closeModal();
+    {
+        name: 'search.png',
+        owner: 'ncthien2805@gmail.com',
+        modified: '02/02/2025',
+        size: '4MB',
+        icon: 'fas fa-file-image',
+        type: 'png',
     },
-    addItem() {
-        const newFolderName = prompt("Nhập tên thư mục mới:");
-        if (newFolderName) {
-            this.items.push({
-                name: newFolderName,
-                owner: 'ncthien2805@gmail.com',
-                modified: new Date().toLocaleDateString(),
-                size: '---',
-                icon: 'fas fa-folder',
-                type: 'folder'
-            });
+    {
+        name: 'work.docx',
+        owner: 'ncthien2805@gmail.com',
+        modified: '02/02/2025',
+        size: '2KB',
+        icon: 'fas fa-file-word',
+        type: 'docx',
+    },
+    {
+        name: 'video.mp4',
+        owner: 'ncthien2805@gmail.com',
+        modified: '02/02/2025',
+        size: '10MB',
+        icon: 'fas fa-file-video',
+        type: 'mp4',
+    },
+]);
+const isModalOpen = ref(false);
+const currentItem = ref(null);
+
+const filteredItems = computed(() => {
+    return items.value.filter((item) => {
+        const matchesSearch = item.name
+            .toLowerCase()
+            .includes(searchQuery.value.toLowerCase());
+        const matchesType = selectedType.value
+            ? item.type === selectedType.value
+            : true;
+        return matchesSearch && matchesType;
+    });
+});
+
+const openModal = (item) => {
+    currentItem.value = item;
+    isModalOpen.value = true;
+};
+
+const closeModal = () => {
+    isModalOpen.value = false;
+    currentItem.value = null;
+};
+
+const editItem = () => {
+    if (currentItem.value) {
+        const newName = prompt('Nhập tên mới cho tệp:', currentItem.value.name);
+        if (newName) {
+            currentItem.value.name = newName;
         }
     }
-}
-;
+};
+
+const deleteItem = () => {
+    if (currentItem.value) {
+        const confirmDelete = confirm('Bạn có chắc chắn muốn xóa tệp này không?');
+        if (confirmDelete) {
+            items.value = items.value.filter((item) => item !== currentItem.value);
+        }
+    }
+    closeModal();
+};
+
+const addItem = () => {
+    const newFolderName = prompt('Nhập tên thư mục mới:');
+    if (newFolderName) {
+        items.value.push({
+            name: newFolderName,
+            owner: 'ncthien2805@gmail.com',
+            modified: new Date().toLocaleDateString(),
+            size: '---',
+            icon: 'fas fa-folder',
+            type: 'folder',
+        });
+    }
+};
 </script>
 
 <style scoped>
