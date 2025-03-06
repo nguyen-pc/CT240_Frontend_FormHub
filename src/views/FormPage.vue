@@ -5,13 +5,16 @@
         <div class="sidebar-header">
           <h2>Form 1</h2>
         </div>
-        <div class="sidebar-menu">
-          <button v-for="question in questions" :key="question.id" :class="{ active: question.active }"
-            @click="setActiveQuestion(question.id)">
-            {{ question.title }}
-            <i class="fa fa-trash" @click.stop="deleteQuestion(question.id)"></i>
-          </button>
-        </div>
+        <ScrollArea>
+          <div class="sidebar-menu">
+            <button v-for="question in questions" :key="question.id" :class="{ active: question.active }"
+              @click="setActiveQuestion(question.id)">
+              {{ question.title }}
+              <i class="fa fa-trash" @click.stop="deleteQuestion(question.id)"></i>
+            </button>
+          </div>
+        </ScrollArea>
+
       </div>
       <div class="main-content">
         <div class="action-bar">
@@ -30,10 +33,14 @@
                 <input v-model="questionName" class="name" type="text" placeholder="Nhập tiêu đề cho câu hỏi" />
                 <div v-if="questionType === 'multiple-choice'" class="choices d-flex flex-column">
                   <button @click="addChoice" class="btn">+ Thêm tùy chọn đáp án</button>
-                  <div class="d-flex" v-for="choice in activeQuestion.choices" :key="choice.id">
-                    <input class="choice" v-model="choice.name" :placeholder="choice.placeholder" />
-                    <i class="fa fa-trash" @click="deleteChoice(choice.id)"></i>
-                  </div>
+                  <ScrollArea>
+                    <div class="choice-zone">
+                      <div class="d-flex" v-for="choice in activeQuestion.choices" :key="choice.id">
+                        <input class="choice" v-model="choice.name" :placeholder="choice.placeholder" />
+                        <i class="fa fa-trash" @click="deleteChoice(choice.id)"></i>
+                      </div>
+                    </div>
+                  </ScrollArea>
                 </div>
               </div>
             </div>
@@ -56,6 +63,7 @@ import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import { useQuestionStore } from "../stores/store";
 import QuestionOption from "@/components/QuestionOption.vue"
+import { ScrollArea } from '@/components/ui/scroll-area'
 const questionStore = useQuestionStore();
 const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion } = storeToRefs(questionStore);
@@ -90,7 +98,7 @@ const updateType = (value) => {
 }
 const deleteQuestion = (id) => {
   // Logic xóa câu hỏi dựa trên id
-  if(questions.value.length>1){
+  if (questions.value.length > 1) {
     const index = questions.value.findIndex((question) => question.id === id);
     if (index !== -1) {
       if (questions.value[index] === activeQuestion.value) {
@@ -98,7 +106,7 @@ const deleteQuestion = (id) => {
         else questions.value[index - 1].active = true;
       }
       questions.value.splice(index, 1);
-      
+
       questionStore.updateID();
     }
   }
@@ -135,6 +143,7 @@ const deleteChoice = (id) => {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
+  max-height: calc(100vh - 120px);
 }
 
 .sidebar-header {
@@ -144,10 +153,10 @@ const deleteChoice = (id) => {
 
 .sidebar-menu {
   padding: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: calc(100vh - 220px);
 }
 
 .sidebar-menu button {
@@ -161,6 +170,10 @@ const deleteChoice = (id) => {
   transition: all 0.2s;
   display: flex;
   justify-content: space-between;
+}
+
+.sidebar-menu button:hover {
+  box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-menu button.active {
@@ -256,19 +269,27 @@ const deleteChoice = (id) => {
 .choices {
   background-color: white;
 }
+
 .choice {
   width: 100%;
   border: 1px solid black;
 }
-.optional{
+
+.choice-zone {
+  max-height: calc(100vh - 440px);
+}
+
+.optional {
   margin: 0 auto;
   width: 180px;
   font-size: 18px;
 }
-.fa-trash{
+
+.fa-trash {
   margin: auto 0;
 }
-.fa-trash:hover{
+
+.fa-trash:hover {
   color: red;
 }
 </style>
