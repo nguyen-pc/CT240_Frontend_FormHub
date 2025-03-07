@@ -32,6 +32,52 @@ export default {
   components: {
     Breadcrumb,
     BreadcrumbItem,
+
+  },
+  data() {
+    return {
+      segments: [],
+      showFormOption: false,
+    };
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler(to) {
+        this.segments = this.createSegments(to);
+        this.showFormOption =
+          to.path === "/main/project/form" || to.path === "/main/project/form/result";
+      },
+    },
+  },
+  methods: {
+    createSegments(route) {
+      const segments = [{ name: "Trang chủ", path: "/" }];
+      if (route.name === "project") {
+        segments.push({ name: "Dự án", path: "/main/project/:id" });
+      } else if (route.name === "project-file") {
+        segments.push({ name: "Dự án", path: "`/main/project/:id/file`" });
+      } else if (route.name === "form") {
+        segments.push({ name: "Dự án", path: "/main/project/:id" });
+        segments.push({ name: "Khảo sát", path: `/main/project/form` });
+      } else if (route.name === "form-result") {
+        segments.push({ name: "Dự án", path: "/main/project" });
+        segments.push({ name: "Khảo sát", path: `/main/project/form/result` });
+      }
+      return segments;
+    },
+    async logout() {
+      const authStore = useAuthStore();
+
+      await authStore
+        .logout()
+        .then(() => {
+          this.$router.replace({ name: "signin" });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
   setup() {
     const authStore = useAuthStore();

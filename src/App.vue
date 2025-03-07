@@ -1,13 +1,15 @@
 <script setup>
 import HeaderComponent from "./components/Header.vue";
 import ProjectDialog from "./components/ProjectDialog.vue";
+import ProjectDialogEdit from "./components/ProjectDialogEdit.vue";
 </script>
 
 <template>
   <div class="container">
     <HeaderComponent v-if="!$route.meta.hideHeader" />
     <router-view />
-    <ProjectDialog/>
+    <ProjectDialogEdit />
+    <ProjectDialog />
   </div>
 </template>
 

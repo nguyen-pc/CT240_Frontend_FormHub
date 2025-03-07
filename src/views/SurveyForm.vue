@@ -23,9 +23,17 @@
 
         <!-- Câu hỏi checkbox -->
         <div v-if="question.questionType === 'CHECKBOX'">
-          <label v-for="option in question.choices" :key="option">
-            <input type="checkbox" :value="option" v-model="question.answer" />
-            {{ option }}
+          <label v-for="option in question.choices" :key="option.choiceId">
+            <input type="checkbox" :value="option.choiceId" v-model="question.answer" />
+            {{ option.choiceText }}
+          </label>
+        </div>
+
+        <!-- Câu hỏi File -->
+        <div v-if="question.questionType === 'FILE_UPLOAD'">
+          <label v-for="option in question.choices" :key="option.choiceId">
+            <input type="checkbox" :value="option.choiceId" v-model="question.answer" />
+            {{ option.choiceText }}
           </label>
         </div>
       </div>
@@ -55,6 +63,12 @@ const fetchQuestion = async () => {
   console.log("Fetching question...");
   try {
     await QuestionStore.getAllQuestion(projectId, surveyId);
+    // Đảm bảo answer của mỗi câu hỏi CHECKBOX là một mảng
+    QuestionStore.questions.forEach((question) => {
+      if (question.questionType === "CHECKBOX" && !Array.isArray(question.answer)) {
+        question.answer = []; // Khởi tạo là mảng rỗng
+      }
+    });
   } catch (e) {
     console.log(e);
   }

@@ -1,4 +1,5 @@
 <template>
+
     <div class="dashboard">
         <!-- Header -->
 
@@ -95,8 +96,11 @@
                 </div>
             </div>
         </div> -->
+ 
     </div>
+  </div>
 </template>
+
 
 <script setup>
 import { Button } from '@/components/ui/button'
@@ -332,214 +336,215 @@ const addItem = () => {
             type: 'folder',
         });
     }
+
 };
 </script>
 
 <style scoped>
 /* Import Font Awesome (hoặc bạn có thể cài đặt qua npm) */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
 }
 
 /* Toàn màn hình với nền gradient */
 .dashboards {
-    height: 150vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
+  height: 150vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Main content */
 .main-content {
-    border-radius: 10px;
-    display: flex;
-    flex: 1;
-    padding: 16px;
-    gap: 16px;
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-    height: 80vh;
+  border-radius: 10px;
+  display: flex;
+  flex: 1;
+  padding: 16px;
+  gap: 16px;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  height: 80vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 25%;
-    background: white;
-    padding: 12px;
-    border-radius: 8px;
-    color: #6a11cb;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 25%;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  color: #6a11cb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar h2 {
-    font-size: 25px;
-    font-weight: bold;
-    margin-bottom: 16px;
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 16px;
 }
 
 .sidebar-btn {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 8px;
-    background: #f0f2f5;
-    color: #6a11cb;
-    border: none;
-    border-radius: 8px;
-    text-align: left;
-    transition: background 0.3s;
-    cursor: pointer;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f0f2f5;
+  color: #6a11cb;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  transition: background 0.3s;
+  cursor: pointer;
 }
 
 .sidebar-btn:hover {
-    background: rgba(106, 17, 203, 0.1);
+  background: rgba(106, 17, 203, 0.1);
 }
 
 .sidebar-btn.active {
-    background: #6a11cb;
-    color: white;
+  background: #6a11cb;
+  color: white;
 }
 
 /* Content (bên phải) */
 .content {
-    flex: 1;
-    background: white;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    color: #333;
+  flex: 1;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #333;
 }
 
 /* Search bar */
 .search-bar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .search-bar input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    outline: none;
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
 }
 
 /* Button chung */
 .btn {
-    padding: 8px 12px;
-    background: #6a11cb;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    margin-left: 8px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  padding: 8px 12px;
+  background: #6a11cb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-left: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filter-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Actions */
 .actions {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .add-btn i,
 .upload-btn i {
-    margin-right: 4px;
+  margin-right: 4px;
 }
 
 /* Table */
 .file-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
 .file-table th,
 .file-table td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
 }
 
 .file-table th {
-    background: rgba(106, 17, 203, 0.1);
+  background: rgba(106, 17, 203, 0.1);
 }
 
 .file-table td i {
-    margin-right: 8px;
+  margin-right: 8px;
 }
 
 /* Modal */
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    width: 300px;
-    /* Đặt chiều rộng cho modal */
-    text-align: center;
-    /* Căn giữa nội dung */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  /* Đặt chiều rộng cho modal */
+  text-align: center;
+  /* Căn giữa nội dung */
 }
 
 .modal-actions {
-    display: flex;
-    flex-direction: column;
-    margin-top: 20px;
-    /* Khoảng cách giữa tiêu đề và các nút */
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  /* Khoảng cách giữa tiêu đề và các nút */
 }
 
 .modal-btn {
-    padding: 10px;
-    background: #6a11cb;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    margin: 5px 0;
-    /* Khoảng cách giữa các nút */
-    cursor: pointer;
-    transition: background 0.3s;
+  padding: 10px;
+  background: #6a11cb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin: 5px 0;
+  /* Khoảng cách giữa các nút */
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
 .modal-btn:hover {
-    background: #5a0fb0;
-    /* Màu khi hover */
+  background: #5a0fb0;
+  /* Màu khi hover */
 }
 
 .cancel-btn {
-    background: #ccc;
-    /* Màu cho nút đóng */
+  background: #ccc;
+  /* Màu cho nút đóng */
 }
 
 .cancel-btn:hover {
-    background: #bbb;
-    /* Màu khi hover cho nút đóng */
+  background: #bbb;
+  /* Màu khi hover cho nút đóng */
 }
 </style>

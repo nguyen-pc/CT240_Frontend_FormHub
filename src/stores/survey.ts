@@ -6,6 +6,12 @@ export interface SurveyGet {
   description: String
 }
 
+export interface SurveyPut {
+  surveyId: any
+  surveyName: String
+  description: String
+}
+
 export interface SurveyPull {
   surveyId: any
   surveyName: String
@@ -66,6 +72,23 @@ export const SurveyStore = defineStore('survey', {
       console.log(projectId)
       try {
         const { data } = await useApiPrivate().post(`/project/${projectId}/survey`, payload)
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+
+    async updateSurvey(projectId: any, payload: SurveyPut) {
+      console.log("update", projectId, payload)
+      try {
+        const { data } = await useApiPrivate().put(`/project/${projectId}/survey`, payload)
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+
+    async deleteSurvey(projectId: any, surveyId: any) {
+      try {
+        await useApiPrivate().delete(`/project/${projectId}/survey/${surveyId}`)
       } catch (e: Error | any) {
         throw e.message
       }
