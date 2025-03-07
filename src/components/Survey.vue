@@ -3,13 +3,13 @@
     <div class="content-wrapper">
       <div class="sidebar">
         <div class="sidebar-header">
-          <h2>{{}}</h2>
+          <h2>{{ projectData.projectName }}</h2>
         </div>
         <div class="sidebar-menu">
           <router-link :to="`/main/project/${param}`">
             <button class="active">📋 Phiếu khảo sát</button>
           </router-link>
-          <router-link to="/main/project/file">
+          <router-link :to="`/main/project/${param}/file`">
             <button>📁 Tài liệu</button>
           </router-link>
         </div>
@@ -84,7 +84,7 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router";
 import { useDialogStore, useDialogStoreEdit, useFormStore } from "../stores/store";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { SurveyStore } from "@/stores/survey";
 import {
   DropdownMenu,
@@ -109,6 +109,7 @@ const route = useRoute();
 const dialogStore = useDialogStore();
 const dialogStoreEdit = useDialogStoreEdit();
 const param = route.params.id;
+const projectData = ref({});
 console.log(route.params.id);
 
 const openProjectDialog = async () => {
@@ -124,22 +125,29 @@ const fetchSurvey = async () => {
   }
 };
 
-const fetchProject = async () => {
-  try {
-    console.log("Fetching project with ID:", param); // Kiểm tra ID
-    await useProjectStore.getProjectsById(param);
-    console.log("Da fetch xong");
-  } catch (e) {
-    console.log(e);
-  }
-};
+// const fetchProject = async () => {
+//   try {
+//     console.log("Fetching project with ID:", param); // Kiểm tra ID
+//     await useProjectStore.getProjectsById(param);
+//     console.log("Da fetch xong");
+//   } catch (e) {
+//     console.log(e);
+//   }
+// };
 
 onMounted(fetchSurvey);
-onMounted(fetchProject); // const projectStore = useProjectStore();
+// onMounted(fetchProject); // const projectStore = useProjectStore();
 const surveys = computed(() => useSurveyStore.surveys);
-const projectById = computed(() => useProjectStore.project);
-console.log("Project By Id", projectById);
+// Lưu dữ liệu vào biến phản ứng
+// const projectById = computed(() => useProjectStore.project);
+// console.log("Project By Id", projectById);
 console.log("All survey", surveys);
+
+onMounted(async () => {
+  const project = await useProjectStore.getProjectsById(param);
+  projectData.value = project;
+  console.log("fetch frontend", projectData);
+});
 
 const deleteSurvey = async (projectId, surveyId) => {
   await useSurveyStore.deleteSurvey(projectId, surveyId);

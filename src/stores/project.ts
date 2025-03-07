@@ -23,8 +23,18 @@ export interface ProjectPull {
   updatedBy: String
 }
 
+export interface ProjectPullById {
+  projectId: any
+  projectName: String
+  description: String
+  createdAt: Date
+  createdBy: String
+  updatedAt: Date
+  updatedBy: String
+}
+
 export interface StateProject {
-  project: ProjectPull
+  project: ProjectPullById
   projects: ProjectPull[]
   accessToken: string
   authReady: boolean
@@ -37,12 +47,11 @@ export const ProjectStore = defineStore('project', {
         projectId: null,
         projectName: '',
         description: '',
-        surveys: [],
         createdAt: new Date(),
         createdBy: '',
         updatedAt: new Date(),
         updatedBy: ''
-      } as ProjectPull,
+      } as ProjectPullById,
       projects: {} as ProjectPull[],
       accessToken: '' as string,
       authReady: false as boolean
@@ -69,11 +78,7 @@ export const ProjectStore = defineStore('project', {
       try {
         console.log('Id project', projectId)
         const { data } = await useApiPrivate().get(`/project/${projectId}`)
-        console.log('Dữ liệu API trả về:', data)
-        if (data) {
-          Object.assign(this.project, data) // ✅ Cập nhật từng thuộc tính mà không làm mất phản ứng của Vue
-        }
-        console.log('Đã cập nhật project:', this.project)
+        return data
       } catch (e: Error | any) {
         throw e.message
       }

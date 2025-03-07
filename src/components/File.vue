@@ -7,7 +7,7 @@
       <!-- Sidebar -->
       <div class="sidebar">
         <h2>Projects 1</h2>
-        <router-link to="/main/project">
+        <router-link :to="`/main/project/${param}`">
           <button class="sidebar-btn">📋 Phiếu khảo sát</button>
         </router-link>
         <button class="sidebar-btn active">📁 Tài liệu</button>
@@ -78,6 +78,8 @@
 </template>
 
 <script>
+import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 export default {
   name: "FileComponent",
   data() {
@@ -149,6 +151,12 @@ export default {
       });
     },
   },
+  setup() {
+    const route = useRoute();
+    const param = computed(() => route.params.id);
+    return { param };
+  },
+
   methods: {
     openModal(item) {
       this.currentItem = item;

@@ -51,11 +51,11 @@ export default {
   },
   methods: {
     createSegments(route) {
-      const segments = [{ name: "Trang chủ", path: "/main" }];
+      const segments = [{ name: "Trang chủ", path: "/" }];
       if (route.name === "project") {
         segments.push({ name: "Dự án", path: "/main/project/:id" });
       } else if (route.name === "project-file") {
-        segments.push({ name: "Dự án", path: "/main/project/file" });
+        segments.push({ name: "Dự án", path: "`/main/project/:id/file`" });
       } else if (route.name === "form") {
         segments.push({ name: "Dự án", path: "/main/project/:id" });
         segments.push({ name: "Khảo sát", path: `/main/project/form` });

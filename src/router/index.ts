@@ -33,7 +33,7 @@ const router = createRouter({
       meta: { breadcrumb: 'Dự án' }
     },
     {
-      path: '/main/project/file',
+      path: '/main/project/:id/file',
       name: 'project-file',
       component: import('../components/File.vue'),
       meta: { breadcrumb: 'Tài liệu' }
@@ -60,8 +60,7 @@ const router = createRouter({
       name: 'signin',
       component: SignIn,
       //hide header
-       meta: { hideHeader: true, breadcrumb: 'Phản hồi' },
-
+      meta: { hideHeader: true, breadcrumb: 'Phản hồi' }
     },
 
     {
