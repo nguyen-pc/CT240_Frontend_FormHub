@@ -3,20 +3,20 @@
     <div class="header-info">
       <h1 id="logoName">FORM HUB</h1>
       <div class="user-info">
-        <span class="user-name">{{ user?.name || "Khách" }}</span>
+        <span class="user-name">{{ user.user?.name || "Khách" }}</span>
         <div class="user-avatar"></div>
         <span @click="logout" v-if="isAuthenticated" class="cursor-pointer">Logout</span>
       </div>
     </div>
     <div class="direction">
-      <Breadcrumb>
-        <BreadcrumbItem v-for="(breadcrumb, index) in breadcrumbs" :key="index">
-          <router-link :to="breadcrumb.href">{{ breadcrumb.name }}</router-link>
-        </BreadcrumbItem>
-      </Breadcrumb>
+      <Breadcrumb :segments="segments" />
       <div v-if="showFormOption" class="form-option">
-        <router-link to="/main/project/form"><button class="btn form">Câu hỏi</button></router-link>
-        <router-link to="/main/project/form/result"><button class="btn form">Phản hồi</button></router-link>
+        <router-link to="/main/project/form"
+          ><button class="btn form">Câu hỏi</button></router-link
+        >
+        <router-link to="/main/project/form/result"
+          ><button class="btn form">Phản hồi</button></router-link
+        >
       </div>
     </div>
   </header>
@@ -24,15 +24,14 @@
 
 <script>
 import { useAuthStore } from "@/stores/auth";
-import { computed, onMounted, watch } from "vue";
-import { useRoute, useRouter } from 'vue-router';
-import { Breadcrumb, BreadcrumbItem } from '@/components/ui/breadcrumb';
+import Breadcrumb from "./Breadcrumb.vue";
+import { computed } from "vue";
+import { onMounted } from "vue";
+import { watch } from "vue";
 
 export default {
   components: {
     Breadcrumb,
-    BreadcrumbItem,
-
   },
   data() {
     return {
@@ -47,6 +46,8 @@ export default {
         this.segments = this.createSegments(to);
         this.showFormOption =
           to.path === "/main/project/form" || to.path === "/main/project/form/result";
+        this.showFormOption =
+          to.path.includes("/main/project") && to.path.includes("/survey");
       },
     },
   },
@@ -81,55 +82,27 @@ export default {
   },
   setup() {
     const authStore = useAuthStore();
-    const route = useRoute();
-    const router = useRouter();
-
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const user = computed(() => authStore.userDetail);
-    const showFormOption = computed(() => route.path === "/main/project/form" || route.path === "/main/project/form/result");
-
-    const breadcrumbs = computed(() => {
-      const projectId = route.params.id;
-      const crumbs = [{ name: "Trang chủ", href: "/main" }];
-
-      if (route.name === "project" && projectId) {
-        crumbs.push({ name: "Dự án", href: `/main/project/${projectId}` });
-      } else if (route.name === "project-file") {
-        crumbs.push({ name: "Dự án", href: "/main/project/file" });
-      } else if (route.name === "form" && projectId) {
-        crumbs.push({ name: "Dự án", href: `/main/project/${projectId}` });
-        crumbs.push({ name: "Khảo sát", href: `/main/project/form` });
-      } else if (route.name === "form-result" && projectId) {
-        crumbs.push({ name: "Dự án", href: `/main/project/${projectId}` });
-        crumbs.push({ name: "Phản hồi", href: `/main/project/form/result` });
-      }
-
-      return crumbs;
-    });
+    async function getUser() {
+      await authStore.getUser();
+    }
+    console.log(user);
 
     onMounted(async () => {
-      await authStore.getUser();
+      await getUser();
     });
-
+    // onMounted(async () => {
+    //   console.log("Fetching user...");
+    //   await authStore.getUser();
+    //   console.log("User after fetch:", authStore.userDetail.email);
+    //   console.log(user);
+    // });
     watch(user, (newValue) => {
       console.log("User updated:", newValue);
     });
 
-    const logout = async () => {
-      await authStore.logout().then(() => {
-        router.replace({ name: "signin" });
-      }).catch((err) => {
-        console.error(err);
-      });
-    };
-
-    return {
-      user,
-      isAuthenticated,
-      breadcrumbs,
-      showFormOption,
-      logout,
-    };
+    return { user, isAuthenticated };
   },
 };
 </script>

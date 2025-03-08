@@ -162,7 +162,7 @@ export const useQuestionStore = defineStore('questionStore', () => {
       active: false,
       require: false,
       maxLength: '',
-      choices: [{ id: 1, name: '',placeholder: 'Tùy chọn 1'}]
+      choices: [{ id: 1, name: '', placeholder: 'Tùy chọn 1' }]
     })
   }
   const addChoice = () => {
@@ -173,9 +173,9 @@ export const useQuestionStore = defineStore('questionStore', () => {
     })
   }
   const updateID = () => {
-    for(let i=0;i<questions.value.length;i++) {
-      questions.value[i].id = i+1;
-      questions.value[i].title = `Question ${i + 1}`;
+    for (let i = 0; i < questions.value.length; i++) {
+      questions.value[i].id = i + 1
+      questions.value[i].title = `Question ${i + 1}`
     }
   }
   const updateChoiceID = () => {

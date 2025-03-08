@@ -8,13 +8,16 @@
         <ScrollArea>
           <div class="sidebar-menu">
             <button
-              v-for="question in questions"
-              :key="question.id"
+              v-for="(question, index) in questionsAPI"
+              :key="question.questionId"
               :class="{ active: question.active }"
-              @click="setActiveQuestion(question.id)"
+              @click="setActiveQuestionAPI(question.questionId)"
             >
-              {{ question.title }}
-              <i class="fa fa-trash" @click.stop="deleteQuestion(question.id)"></i>
+              {{ index + 1 }}. {{ question.questionName }}
+              <i
+                class="fa fa-trash"
+                @click.stop="deleteQuestionAPI(projectId, surveyId, question.questionId)"
+              ></i>
             </button>
           </div>
         </ScrollArea>
@@ -40,7 +43,7 @@
                   placeholder="Nhập tiêu đề cho câu hỏi"
                 />
                 <div
-                  v-if="questionType === 'multiple-choice'"
+                  v-if="questionType === 'MULTIPLE_CHOICE' || questionType === 'CHECKBOX'"
                   class="choices d-flex flex-column"
                 >
                   <button @click="addChoice" class="btn">+ Thêm tùy chọn đáp án</button>
@@ -83,16 +86,97 @@
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
-import { ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useQuestionStore } from "../stores/store";
 import QuestionOption from "@/components/QuestionOption.vue";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useQuestionStoreAPI } from "@/stores/question";
+import { useRoute } from "vue-router";
 const questionStore = useQuestionStore();
+const QuestionStoreAPI = useQuestionStoreAPI();
 const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion } = storeToRefs(questionStore);
 
-const addQuestion = () => {
-  questionStore.addQuestion();
+const route = useRoute();
+const projectId = route.params.projectId;
+const surveyId = route.params.surveyId;
+const questionData = ref({});
+
+const fetchQuestion = async () => {
+  console.log("Fetching question...");
+  try {
+    await QuestionStoreAPI.getAllQuestion(projectId, surveyId);
+    // Đảm bảo answer của mỗi câu hỏi CHECKBOX là một mảng
+    QuestionStoreAPI.questions.forEach((question) => {
+      if (question.questionType === "CHECKBOX" && !Array.isArray(question.answer)) {
+        question.answer = []; // Khởi tạo là mảng rỗng
+      }
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+onMounted(() => {
+  fetchQuestion();
+});
+
+const questionsAPI = computed(() => QuestionStoreAPI.questions);
+console.log("QuestionAPI", questionsAPI);
+
+const getFormattedQuestionData = () => {
+  if (!activeQuestion.value) return null;
+
+  const formattedData = {
+    questionName: activeQuestion.value.name,
+    questionType: activeQuestion.value.type,
+    require: activeQuestion.value.require,
+    choices: activeQuestion.value.choices.map((choice) => ({
+      choiceText: choice.name,
+    })),
+  };
+
+  console.log("Dữ liệu theo định dạng API:", formattedData);
+  return formattedData;
+};
+
+const setActiveQuestionAPI = async (questionId) => {
+  try {
+    const question = await QuestionStoreAPI.getQuestionById(
+      projectId,
+      surveyId,
+      questionId
+    );
+    console.log(question);
+    // questionStore.setActiveQuestion(question); // Cập nhật vào Pinia
+  } catch (e) {
+    console.error("Lỗi khi lấy câu hỏi:", e);
+  }
+};
+// const questionName = computed({
+//   get: () => activeQuestion.value?.name || "",
+//   set: (newName) => {
+//     if (activeQuestion.value) {
+//       activeQuestion.value.name = newName;
+//     }
+//   },
+// });
+
+// const questionType = computed({
+//   get: () => activeQuestion.value?.type || "",
+//   set: (newType) => {
+//     if (activeQuestion.value) {
+//       activeQuestion.value.type = newType;
+//     }
+//   },
+// });
+
+console.log("active", activeQuestion);
+const addQuestion = async () => {
+  // questionStore.addQuestion();
+  const questionData = getFormattedQuestionData();
+  await QuestionStoreAPI.createQuestion(projectId, surveyId, questionData);
+  fetchQuestion();
 };
 const addChoice = () => {
   questionStore.addChoice();
@@ -139,6 +223,18 @@ const deleteQuestion = (id) => {
     }
   }
 };
+
+// onMounted(async () => {
+//   const question = await QuestionStoreAPI.getQuestionById(projectId, surveyId);
+//   .value = project;
+//   console.log("fetch frontend", projectData);
+// });
+
+const deleteQuestionAPI = async (projectId, surveyId, questionId) => {
+  await QuestionStoreAPI.deleteQuestion(projectId, surveyId, questionId);
+  await fetchQuestion();
+};
+
 const deleteChoice = (id) => {
   if (activeQuestion.value?.choices.length > 1) {
     const index = activeQuestion.value.choices.findIndex((choice) => choice.id === id);

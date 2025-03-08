@@ -22,7 +22,7 @@ export interface StateQuestion {
   authReady: boolean
 }
 
-export const useQuestionStore = defineStore('question', {
+export const useQuestionStoreAPI = defineStore('question', {
   state: (): StateQuestion => {
     return {
       question: {} as QuestionPull,
@@ -41,14 +41,69 @@ export const useQuestionStore = defineStore('question', {
     async getAllQuestion(projectId: any, surveyId: any) {
       console.log(projectId, surveyId)
       try {
-        const { data } = await useApiPrivate().get(
-          `/project/${projectId}/survey/${surveyId}/question/all`
-        )
+        const { data } = await useApi().get(`/project/${projectId}/survey/${surveyId}/question/all`)
+
         this.questions = data
         console.log(data)
       } catch (e: Error | any) {
         throw e.message
       }
+    },
+
+    async createQuestion(projectId: any, surveyId: any, payload: any) {
+      console.log(payload)
+      try {
+        const { data } = await useApiPrivate().post(
+          `/project/${projectId}/survey/${surveyId}/question`,
+          payload
+        )
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+    async deleteQuestion(projectId: any, surveyId: any, questionId: any) {
+      try {
+        const { data } = await useApiPrivate().delete(
+          `/project/${projectId}/survey/${surveyId}/question/${questionId}`
+        )
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+    async getQuestionById(projectId: any, surveyId: any, questionId: any) {
+      try {
+        const { data } = await useApiPrivate().get(
+          `/project/${projectId}/survey/${surveyId}/question/${questionId}`
+        )
+        return data
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+    async editQuestionById(projectId: any, surveyId: any, questionId: any, payload: any) {
+      try {
+        const { data } = await useApiPrivate().put(
+          `/project/${projectId}/survey/${surveyId}/question/${questionId}`,
+          payload
+        )
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+
+    async submitAnswers(surveyId: any, payload: any) {
+      try {
+        const { data } = await useApi().post(`/survey/${surveyId}/response`, payload)
+      } catch (e: Error | any) {
+        throw e.message
+      }
     }
+    // setActiveQuestion(id: any) {
+    //   this.questions = this.questions.map((q) => ({
+    //     ...q,
+    //     active: q.questionId === id
+    //   }))
+    //   this.question = this.questions.find((q) => q.active) || null
+    // }
   }
 })

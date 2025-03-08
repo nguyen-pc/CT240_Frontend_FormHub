@@ -39,7 +39,7 @@ const router = createRouter({
       meta: { breadcrumb: 'Tài liệu' }
     },
     {
-      path: '/main/project/:id/survey/:id',
+      path: '/main/project/:projectId/survey/:surveyId',
       name: 'form',
       component: FormPage,
       meta: { breadcrumb: 'Khảo sát' }
