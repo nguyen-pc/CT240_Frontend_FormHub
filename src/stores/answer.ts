@@ -51,6 +51,31 @@ export const useAnswerStoreAPI = defineStore('answer', {
       } catch (e: Error | any) {
         throw e.message
       }
+    },
+    async getFile(surveyId: any){
+      try{
+        const {data} = await useApiPrivate().get(`files/${surveyId}/list`)
+        return data
+      }catch (e: Error | any) {
+        throw e.message
+      }
+    },
+    async downloadFile(folder: any, fileName: any){
+      try{
+        const {data} = await useApiPrivate().get(`/files?folder=${folder}&fileName=${fileName}`)
+        return data
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+    async deleteFile(folder: any, fileName: any){
+      try{
+        const {data} = await useApiPrivate().delete(`/files?folder=${folder}&fileName=${fileName}`)
+        
+      } catch (e: Error | any) {
+        throw e.message
+      }
     }
+
   }
 })

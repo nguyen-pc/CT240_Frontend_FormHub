@@ -39,6 +39,12 @@ const router = createRouter({
       meta: { breadcrumb: 'Tài liệu' }
     },
     {
+      path: '/main/project/:id/file/:folderId',
+      name: 'project-file-children',
+      component: import('../components/FileChildren.vue'),
+      meta: { breadcrumb: 'Tài liệu' }
+    },
+    {
       path: '/main/project/:projectId/survey/:surveyId',
       name: 'form',
       component: FormPage,

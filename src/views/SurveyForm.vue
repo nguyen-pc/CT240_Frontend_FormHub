@@ -41,6 +41,7 @@
               'video/*',
               'application/pdf',
               'application/msword',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
               'application/vnd.ms-excel',
             ]"
             @updatefiles="handleFileChange"

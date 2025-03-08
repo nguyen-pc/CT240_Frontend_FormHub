@@ -23,10 +23,14 @@
 
           <select class="btn filter-btn" v-model="selectedType">
             <option value="">Tất cả</option>
-            <option value="folder">Thư mục</option>
             <option value="mp4">MP4</option>
-            <option value="docx">DOCX</option>
-            <option value="png">PNG</option>
+            <option value="application/pdf">PDF</option>
+            <option
+              value="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            >
+              Word
+            </option>
+            <option value="image/jpeg">PNG</option>
           </select>
         </div>
 
@@ -34,7 +38,10 @@
           <button class="btn add-btn" @click="addItem">
             <i class="fas fa-plus"></i> Thư mục mới
           </button>
-          <button class="btn upload-btn">Tải tệp lên</button>
+
+          <label class="btn upload-btn">
+            <input type="file" class="hidden" @change="handleFileUpload" />Tải tệp lên
+          </label>
         </div>
 
         <!-- File table -->
@@ -49,26 +56,37 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in surveys" :key="index">
-              <td @click="goToFileChildren" class="cursor-pointer">
-                <i :class="item.icon"></i> 📁{{ item.surveyName }}
+            <tr v-for="(item, index) in filteredItems" :key="index">
+              <td
+                @click="openFile(item.fileName)"
+                class="cursor-pointer hover:text-yellow-600"
+              >
+                <i :class="item.icon"></i> {{ item.fileName }}
               </td>
               <td>{{ item.createdBy }}</td>
               <td>{{ item.createdAt }}</td>
-              <td>{{ item.size }}</td>
+              <td>{{ item.fileSize }}</td>
               <td>
                 <DropdownMenu>
                   <DropdownMenuTrigger as-child>
                     <Button variant="outline"> ... </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent class="w-56">
+                  <DropdownMenuContent class="w-45">
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuItem>
-                        <span>Sửa</span>
+                        <span
+                          class="cursor-pointer hover:text-yellow-600"
+                          @click="downloadFile(item.fileName)"
+                          >Tải xuống</span
+                        >
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <span>Xóa</span>
+                        <span
+                          @click="deleteFile(item.fileName)"
+                          class="cursor-pointer hover:text-yellow-600"
+                          >Xóa</span
+                        >
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
@@ -111,16 +129,18 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SurveyStore } from "@/stores/survey";
+import { useAnswerStoreAPI } from "@/stores/answer";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { format } from "date-fns";
+
 const route = useRoute();
 const router = useRouter();
-const projectId = route.params.id;
-const surveyData = ref({});
-const useSurveyStore = SurveyStore();
+const surveyId = route.params.folderId;
+const useAnswerStore = useAnswerStoreAPI();
 const searchQuery = ref("");
 const selectedType = ref("");
+const fileData = ref([]);
 const items = ref([
   {
     name: "Folder 1",
@@ -171,41 +191,89 @@ const items = ref([
     type: "mp4",
   },
 ]);
-
-const fetchSurvey = async () => {
-  console.log("🔍 Fetching surveys for projectId:", projectId);
-  await useSurveyStore.getAllSurvey(projectId);
-  console.log("✅ Surveys in component:", surveys.value);
-};
-
-onMounted(fetchSurvey);
-const surveys = computed(() => useSurveyStore.surveys);
-console.log(surveys);
 const isModalOpen = ref(false);
 const currentItem = ref(null);
 
 const param = computed(() => route.params.id);
 
 const filteredItems = computed(() => {
-  return items.value.filter((item) => {
-    const matchesSearch = item.name
+  return fileData.value.filter((item) => {
+    const matchesSearch = item.fileName
       .toLowerCase()
       .includes(searchQuery.value.toLowerCase());
-    const matchesType = selectedType.value ? item.type === selectedType.value : true;
+    const matchesType = selectedType.value ? item.fileType === selectedType.value : true;
     return matchesSearch && matchesType;
   });
 });
 
-const goToFileChildren = (surveyId) => {
-  router.push(`/main/project/3/file/1`);
+const fetchFile = async (surveyId) => {
+  try {
+    await useAnswerStore.getFile(surveyId);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
-// onMounted(async () => {
-//   console.log("File", projectId);
-//   const surveys = await useSurveyStore.getAllSurvey(projectId);
-//   surveyData.value = surveys;
-//   console.log("fetch frontend", surveyData);
-// });
+// const downloadFile = async (fileName) => {
+//   console.log(fileName, surveyId);
+//   const data = await useAnswerStore.downloadFile(surveyId, fileName);
+//   console.log(data);
+// };
+const downloadFile = async (fileName) => {
+  try {
+    const fileUrl = `${import.meta.env.VITE_API_URI}/storage/${surveyId}/${fileName}`;
+    const response = await fetch(fileUrl);
+
+    if (!response.ok) {
+      throw new Error("Không thể tải file!");
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    // Tạo một thẻ <a> để tải file xuống
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    console.log("Tải xuống thành công:", fileName);
+  } catch (error) {
+    console.error("Lỗi khi tải file:", error);
+    alert("Lỗi khi tải file!");
+  }
+};
+onMounted(async () => {
+  const files = await useAnswerStore.getFile(surveyId);
+  // Format lại dữ liệu
+  const formattedFiles = files.map((file) => ({
+    ...file,
+    fileSize: `${(file.fileSize / 1024).toFixed(2)} KB`, // Chuyển Byte -> KB, làm tròn 2 chữ số thập phân
+    createdAt: format(new Date(file.createdAt), "yyyy-MM-dd HH:mm:ss"), // Format thời gian
+  }));
+
+  fileData.value = formattedFiles;
+  console.log("Formatted file data", fileData.value);
+});
+
+const openFile = (fileName) => {
+  const fileUrl = `${import.meta.env.VITE_API_URI}/storage/${surveyId}/${fileName}`;
+  window.open(fileUrl, "_blank"); // Mở file trong tab mới
+};
+
+const deleteFile = async (fileName) => {
+  await useAnswerStore.deleteFile(surveyId, fileName);
+  window.location.reload();
+};
+
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  await useAnswerStore.uploadfile(file, surveyId);
+  window.location.reload();
+};
 
 const openModal = (item) => {
   currentItem.value = item;
@@ -310,7 +378,6 @@ body {
   border: none;
   border-radius: 8px;
   text-align: left;
-  text-decoration: none;
   transition: background 0.3s;
   cursor: pointer;
 }

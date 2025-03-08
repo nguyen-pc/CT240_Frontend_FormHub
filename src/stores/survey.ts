@@ -51,7 +51,8 @@ export const SurveyStore = defineStore('survey', {
         const { data } = await useApiPrivate().get(`/project/${projectId}/survey`)
         this.surveys = data
 
-        // console.log(data)
+        // return data
+        console.log(data)
       } catch (e: Error | any) {
         throw e.message
       }
@@ -78,7 +79,7 @@ export const SurveyStore = defineStore('survey', {
     },
 
     async updateSurvey(projectId: any, payload: SurveyPut) {
-      console.log("update", projectId, payload)
+      console.log('update', projectId, payload)
       try {
         const { data } = await useApiPrivate().put(`/project/${projectId}/survey`, payload)
       } catch (e: Error | any) {
