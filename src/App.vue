@@ -18,9 +18,9 @@ import ProjectDialog from "./components/ProjectDialog.vue";
     <ProjectDialog />
 
     <!-- Nút để thử truy cập trang cảm ơn -->
-    <button @click="$router.push('/thank-you')" class="thank-you-btn">
+    <!-- <button @click="$router.push('/thank-you')" class="thank-you-btn">
       Xem trang cảm ơn
-    </button>
+    </button> -->
   </div>
 </template>
 
