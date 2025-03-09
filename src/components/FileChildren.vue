@@ -6,7 +6,7 @@
     <div class="main-content">
       <!-- Sidebar -->
       <div class="sidebar">
-        <h2>Projects 1</h2>
+        <h2>{{ projectData.projectName }}</h2>
         <router-link :to="`/main/project/${param}`">
           <button class="sidebar-btn">📋 Phiếu khảo sát</button>
         </router-link>
@@ -133,11 +133,16 @@ import { useAnswerStoreAPI } from "@/stores/answer";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { format } from "date-fns";
+import { ProjectStore } from "@/stores/project";
 
 const route = useRoute();
 const router = useRouter();
 const surveyId = route.params.folderId;
+const projectId = route.params.id;
 const useAnswerStore = useAnswerStoreAPI();
+const useProjectStore = ProjectStore();
+
+const projectData = ref({});
 const searchQuery = ref("");
 const selectedType = ref("");
 const fileData = ref([]);
@@ -149,46 +154,6 @@ const items = ref([
     size: "---",
     icon: "fas fa-folder",
     type: "folder",
-  },
-  {
-    name: "Folder 2",
-    owner: "phapchau@gmail.com",
-    modified: "01/02/2025",
-    size: "---",
-    icon: "fas fa-folder",
-    type: "folder",
-  },
-  {
-    name: "Folder 3",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "---",
-    icon: "fas fa-folder",
-    type: "folder",
-  },
-  {
-    name: "search.png",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "4MB",
-    icon: "fas fa-file-image",
-    type: "png",
-  },
-  {
-    name: "work.docx",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "2KB",
-    icon: "fas fa-file-word",
-    type: "docx",
-  },
-  {
-    name: "video.mp4",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "10MB",
-    icon: "fas fa-file-video",
-    type: "mp4",
   },
 ]);
 const isModalOpen = ref(false);
@@ -257,6 +222,12 @@ onMounted(async () => {
 
   fileData.value = formattedFiles;
   console.log("Formatted file data", fileData.value);
+});
+
+onMounted(async () => {
+  const project = await useProjectStore.getProjectsById(projectId);
+  projectData.value = project;
+  console.log("fetch frontend", projectData);
 });
 
 const openFile = (fileName) => {

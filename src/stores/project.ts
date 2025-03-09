@@ -1,5 +1,6 @@
 import { useApi, useApiPrivate } from '@/composable/useApi'
 import { defineStore } from 'pinia'
+import { toast } from 'vue3-toastify'
 
 export interface ProjectGet {
   projectName: String
@@ -68,7 +69,7 @@ export const ProjectStore = defineStore('project', {
       try {
         const { data } = await useApiPrivate().get('/project')
         this.projects = data
-        console.log(data)
+        return data
       } catch (e: Error | any) {
         throw e.message
       }

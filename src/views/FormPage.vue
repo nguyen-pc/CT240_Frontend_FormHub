@@ -34,7 +34,8 @@
         <div class="d-flex">
           <div class="question-content">
             <div v-if="activeQuestion">
-              <h4>{{ activeQuestion.title }}</h4>
+              <!-- <h4>{{ activeQuestion.title }}</h4> -->
+              <h4>Câu hỏi mới</h4>
               <div class="question-box">
                 <input
                   v-model="questionName"

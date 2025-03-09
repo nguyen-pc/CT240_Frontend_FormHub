@@ -51,7 +51,7 @@ export const SurveyStore = defineStore('survey', {
         const { data } = await useApiPrivate().get(`/project/${projectId}/survey`)
         this.surveys = data
 
-        // return data
+        return data
         console.log(data)
       } catch (e: Error | any) {
         throw e.message

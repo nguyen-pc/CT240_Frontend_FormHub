@@ -29,8 +29,8 @@
   </Dialog>
 </template>
 
-<script setup>
-import { ref, watch } from "vue";
+<script setup lang="ts">
+import { ref, watch, onMounted, computed } from "vue";
 import { useDialogStore, useProjectStore, useFormStore } from "../stores/store";
 import {
   Dialog,
@@ -43,6 +43,8 @@ import { Button } from "@/components/ui/button";
 import { ProjectStore } from "@/stores/project";
 import { SurveyStore } from "@/stores/survey";
 import { useRoute } from "vue-router";
+import { toast, type ToastOptions } from "vue3-toastify";
+
 
 const route = useRoute();
 const dialogStore = useDialogStore();
@@ -83,6 +85,9 @@ const getCurrentDate = () => {
   const year = today.getFullYear();
   return `${day}/${month}/${year}`;
 };
+
+
+
 const handleSubmit = async () => {
   console.log(newData.value, newDescription.value);
   if (newData.value.trim() === "") return;
@@ -91,8 +96,23 @@ const handleSubmit = async () => {
       projectName: newData.value,
       description: newDescription.value,
     };
-    await projectStore.createProject(payload);
-    await projectStore.getAllProjects();
+    try{
+      await projectStore.createProject(payload);
+      await projectStore.getAllProjects();
+      // console.log("🔄 Danh sách dự án sau khi fetch:", useProject.projects);
+      toast.success("Tạo dự án thành công!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+
+    }catch(e){
+      console.log(e)
+      toast.error("Lỗi khi tạo dự án!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    }
+
     // ///////
     useProject.addProject({
       id: useProject.projects.length + 1,
@@ -108,8 +128,21 @@ const handleSubmit = async () => {
       surveyName: newData.value,
       description: newDescription.value,
     };
-    await surveyStore.createSurvey(route.params.id, payload);
-    await surveyStore.getAllSurvey(route.params.id);
+    try{
+      await surveyStore.createSurvey(route.params.id, payload);
+      await surveyStore.getAllSurvey(route.params.id);
+      toast.success("Tạo khảo sát thành công!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    }catch(error){
+      console.log(error)
+      toast.error("Lỗi khi tạo khảo sát!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    }
+
     useForm.addSurvey({
       id: useForm.forms.surveys.length + 1,
       name: newData.value,
@@ -117,6 +150,7 @@ const handleSubmit = async () => {
     });
   }
   newData.value = "";
+  newDescription.value = "";
   closeDialog();
 };
 </script>

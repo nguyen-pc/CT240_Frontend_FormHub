@@ -29,7 +29,7 @@
   </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from "vue";
 import {
   useDialogStore,
@@ -48,6 +48,9 @@ import { Button } from "@/components/ui/button";
 import { ProjectStore } from "@/stores/project";
 import { SurveyStore } from "@/stores/survey";
 import { useRoute } from "vue-router";
+import { toast, type ToastOptions } from "vue3-toastify";
+
+
 
 const route = useRoute();
 const dialogStore = useDialogStoreEdit();
@@ -106,8 +109,21 @@ const handleSubmit = async () => {
       projectName: nameEdit.value,
       description: descriptionEdit.value,
     };
-    await projectStore.updateProject(payload);
-    await projectStore.getAllProjects();
+    try {
+      await projectStore.updateProject(payload);
+      await projectStore.getAllProjects();
+      toast.success("Sửa dự án thành công!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    } catch (error) {
+      console.error("Lỗi khi sửa dự án:", error);
+      toast.error("Lỗi khi sửa dự án!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    }
+
     // ///////
     useProject.addProject({
       id: useProject.projects.length + 1,
@@ -124,8 +140,22 @@ const handleSubmit = async () => {
       surveyName: nameEdit.value,
       description: descriptionEdit.value,
     };
-    await surveyStore.updateSurvey(route.params.id, payload);
-    await surveyStore.getAllSurvey(route.params.id);
+    try{
+      await surveyStore.updateSurvey(route.params.id, payload);
+      await surveyStore.getAllSurvey(route.params.id);
+      toast.success("Sửa khảo sát thành công!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    }catch(error){
+      console.log(e)
+      console.error("Lỗi khi sửa khảo sát:", error);
+      toast.error("Lỗi khi sửa khảo sát!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    }
+
     useForm.addSurvey({
       id: useForm.forms.surveys.length + 1,
       name: nameEdit.value,
@@ -133,6 +163,7 @@ const handleSubmit = async () => {
     });
   }
   nameEdit.value = "";
+  descriptionEdit.value =""
   closeDialog();
 };
 </script>

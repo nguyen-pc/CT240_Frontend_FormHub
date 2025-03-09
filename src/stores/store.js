@@ -5,15 +5,21 @@ export const useDialogStore = defineStore('dialog', () => {
   const isOpen = ref(false)
   const title = ref('')
   const data = ref({})
+  let callback = null
 
-  const openDialog = (dialogTitle, dialogData) => {
+  const openDialog = (dialogTitle, dialogData, cb) => {
     title.value = dialogTitle
     data.value = dialogData
     isOpen.value = true
+    callback = cb || null
   }
 
   const closeDialog = () => {
     isOpen.value = false
+    if (callback) {
+      callback() // ✅ Gọi callback khi dialog đóng
+      callback = null // ✅ Reset để tránh gọi lại lần sau
+    }
   }
 
   return { isOpen, title, data, openDialog, closeDialog }
@@ -26,17 +32,23 @@ export const useDialogStoreEdit = defineStore('dialogEdit', () => {
   const nameEdit = ref('')
   const descriptionEdit = ref('')
   const dataEdit = ref({})
+  let callback = null
 
-  const openDialogEdit = (dialogTitle, id, name, description) => {
+  const openDialogEdit = (dialogTitle, id, name, description, cb) => {
     titleEdit.value = dialogTitle
     idEdit.value = id
     nameEdit.value = name
     descriptionEdit.value = description
     isOpenEdit.value = true
+    callback = cb || null
   }
 
   const closeDialogEdit = () => {
     isOpenEdit.value = false
+    if (callback) {
+      callback() // ✅ Gọi callback khi dialog đóng
+      callback = null // ✅ Reset để tránh gọi lại lần sau
+    }
   }
   console.log('Data Edit', dataEdit.value)
 

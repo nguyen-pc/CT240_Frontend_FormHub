@@ -51,7 +51,7 @@ const router = createRouter({
       meta: { breadcrumb: 'Khảo sát' }
     },
     {
-      path: '/main/project/form/result',
+      path: '/main/project/:projectId/survey/:surveyId/result',
       name: 'form-result',
       component: ResultPage,
       meta: { breadcrumb: 'Phản hồi' }

@@ -6,7 +6,7 @@
     <div class="main-content">
       <!-- Sidebar -->
       <div class="sidebar">
-        <h2>Projects 1</h2>
+        <h2>{{ projectData.projectName }}</h2>
         <router-link :to="`/main/project/${param}`">
           <button class="sidebar-btn">📋 Phiếu khảo sát</button>
         </router-link>
@@ -112,6 +112,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SurveyStore } from "@/stores/survey";
+import { ProjectStore } from "@/stores/project";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
@@ -119,6 +120,9 @@ const router = useRouter();
 const projectId = route.params.id;
 const surveyData = ref({});
 const useSurveyStore = SurveyStore();
+const useProjectStore = ProjectStore();
+
+const projectData = ref({});
 const searchQuery = ref("");
 const selectedType = ref("");
 const items = ref([
@@ -184,6 +188,11 @@ console.log(surveys);
 const isModalOpen = ref(false);
 const currentItem = ref(null);
 
+onMounted(async () => {
+  const project = await useProjectStore.getProjectsById(projectId);
+  projectData.value = project;
+  console.log("fetch frontend", projectData);
+});
 const param = computed(() => route.params.id);
 
 const filteredItems = computed(() => {

@@ -2,7 +2,12 @@
   <div class="dashboard">
     <div class="board-header">
       <div class="search-bar">
-        <input type="text" style="color: black" placeholder="Nhập dự án cần tìm" />
+        <input
+          type="text"
+          style="color: black"
+          placeholder="Nhập dự án cần tìm"
+          v-model="searchQuery"
+        />
         <button class="btn">A-Z</button>
       </div>
       <div class="add-project">
@@ -21,7 +26,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="project-row" v-for="(project, index) in projects" :key="index">
+        <tr class="project-row" v-for="(project, index) in filteredItems" :key="index">
           <td>
             <div class="dot"></div>
           </td>
@@ -50,11 +55,16 @@
                           project.description
                         )
                       "
+                      class="cursor-pointer hover:text-yellow-600"
                       >Sửa thông tin</span
                     >
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <span @click="deleteProject(project.projectId)">Xóa dự án</span>
+                    <span
+                      class="cursor-pointer hover:text-yellow-600"
+                      @click="deleteProject(project.projectId)"
+                      >Xóa dự án</span
+                    >
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
@@ -67,10 +77,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ProjectStore } from "@/stores/project";
 import { useDialogStore, useDialogStoreEdit } from "../stores/store";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted } from "vue";
 import {
@@ -87,45 +97,116 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/toast/use-toast";
+import { h } from "vue";
+import { toast, type ToastOptions } from "vue3-toastify";
+import { format } from "date-fns";
+
 const dialogStore = useDialogStore();
 const dialogStoreEdit = useDialogStoreEdit();
 const useProjectStore = ProjectStore();
+
+const searchQuery = ref("");
 const router = useRouter();
 const route = useRoute();
+let projectData = ref([]);
 
 const openProjectDialog = async () => {
-  dialogStore.openDialog("dự án", { name: "", description: "" });
 
-  await fetchProjects(); // Gọi lại API để cập nhật danh sách
+  await dialogStore.openDialog("dự án", { name: "", description: "" }, async () => {
+    try {
+      await fetchProjects();
+    } catch (error) {
+      console.error("Lỗi khi fetch dự án:", error);
+    }
+
+  });
 };
 
+
+// const fetchProjects = async () => {
+//   try {
+//      await useProjectStore.getAllProjects();
+//   } catch (e) {
+//     console.log(e);
+//   }
+// };
 const fetchProjects = async () => {
   try {
-    await useProjectStore.getAllProjects();
+    const projects = await useProjectStore.getAllProjects();
+    projectData.value = projects.map((project) => ({
+      ...project,
+      createdAt: format(new Date(project.createdAt), "yyyy-MM-dd HH:mm:ss"),
+    }));
+    console.log("Danh sách dự án đã cập nhật:", projectData.value);
   } catch (e) {
-    console.log(e);
+    console.error("Lỗi khi fetch dự án:", e);
   }
 };
 
 onMounted(fetchProjects); // const projectStore = useProjectStore();
 const projects = computed(() => useProjectStore.projects);
-console.log("All project", projects);
+
 
 const openProjectDialogEdit = async (id, name, description) => {
   console.log(id, name, description);
-  await dialogStoreEdit.openDialogEdit("dự án", id, name, description);
+  await dialogStoreEdit.openDialogEdit("dự án", id, name, description, async () => {
+    try {
+      await fetchProjects();
+    } catch (error) {
+      console.error("Lỗi khi fetch dự án:", error);
+    }
+
+  });
 
   await fetchProjects(); // Gọi lại API để cập nhật danh sách
 };
 
 const deleteProject = async (projectId) => {
-  await useProjectStore.deleteProject(projectId);
-  await fetchProjects();
+  try {
+    await useProjectStore.deleteProject(projectId);
+
+    await fetchProjects();
+    toast.success("Xóa dự án thành công!", {
+      autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+   } as ToastOptions)
+  } catch (error) {
+    console.error("Lỗi khi xóa dự án:", error);
+    toast.error("Lỗi khi xóa dự án!", {
+      autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+   } as ToastOptions)
+  }
 };
 
 const projectID = (projectId) => {
   router.push({ name: "project", params: { id: projectId } });
 };
+// onMounted(async () => {
+//   const projects =  await useProjectStore.getAllProjects();
+//   // Format lại dữ liệu
+//   const formattedProject = projects.map((project) => ({
+//     ...project,
+//     createdAt: format(new Date(project.createdAt), "yyyy-MM-dd HH:mm:ss"), // Format thời gian
+//   }));
+
+//   projectData.value = formattedProject;
+
+//   console.log("Formatted project data", projectData.value);
+// });
+
+const filteredItems = computed(() => {
+
+  return projectData.value.filter((item) =>
+    item.projectName.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
+
+
+
+console.log("filter",filteredItems)
 </script>
 
 <style scoped>

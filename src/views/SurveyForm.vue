@@ -201,7 +201,7 @@ const submitSurvey = async () => {
 
   // Gọi API để gửi dữ liệu, ví dụ:
   try {
-    // await QuestionStore.submitAnswers(surveyId, payload);
+    await QuestionStore.submitAnswers(surveyId, payload);
     const file = uploadedFiles.value;
     console.log("file API", file[0]);
     await useAnswerStore.uploadfile(file[0], surveyId);

@@ -18,7 +18,11 @@
       <div class="main-content">
         <div class="action-bar">
           <div class="search-container">
-            <input type="text" placeholder="Nhập phiếu khảo sát cần tìm" />
+            <input
+              type="text"
+              placeholder="Nhập phiếu khảo sát cần tìm"
+              v-model="searchQuery"
+            />
             <button class="btn">
               <i class="fas fa-search"></i>
             </button>
@@ -33,7 +37,7 @@
         <div class="survey-board">
           <h3 class="board-title">Danh sách phiếu khảo sát ({{ surveys.length }})</h3>
           <div class="survey-grid">
-            <div v-for="survey in surveys" :key="survey.id" class="survey-card">
+            <div v-for="survey in filteredItems" :key="survey.id" class="survey-card">
               <div class="card-header">
                 <router-link
                   :to="`/main/project/${route.params.id}/survey/${survey.surveyId}`"
@@ -56,11 +60,14 @@
                                   survey.description
                                 )
                               "
+                              class="cursor-pointer hover:text-yellow-600"
                               >Sửa thông tin</span
                             >
                           </DropdownMenuItem>
                           <DropdownMenuItem class="mt-2 cursor-pointer">
-                            <span @click="deleteSurvey(param, survey.surveyId)"
+                            <span
+                              class="cursor-pointer hover:text-yellow-600"
+                              @click="deleteSurvey(param, survey.surveyId)"
                               >Xóa dự án</span
                             >
                           </DropdownMenuItem>
@@ -101,6 +108,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ProjectStore } from "@/stores/project";
+import { format } from "date-fns";
 const useSurveyStore = SurveyStore();
 const useProjectStore = ProjectStore();
 const router = useRouter();
@@ -110,30 +118,42 @@ const dialogStore = useDialogStore();
 const dialogStoreEdit = useDialogStoreEdit();
 const param = route.params.id;
 const projectData = ref({});
+const surveyData = ref([]);
+const searchQuery = ref("");
+
 console.log(route.params.id);
 
 const openProjectDialog = async () => {
-  dialogStore.openDialog("khảo sát", { name: "", description: "" });
-  await fetchSurvey();
+  dialogStore.openDialog("khảo sát", { name: "", description: "" }, async () => {
+    try {
+      await fetchSurvey();
+    } catch (error) {
+      console.error("Lỗi khi fetch dự án:", error);
+    }
+  });
 };
 
-const fetchSurvey = async () => {
-  try {
-    await useSurveyStore.getAllSurvey(param);
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-// const fetchProject = async () => {
+// const fetchSurvey = async () => {
 //   try {
-//     console.log("Fetching project with ID:", param); // Kiểm tra ID
-//     await useProjectStore.getProjectsById(param);
-//     console.log("Da fetch xong");
+//     await useSurveyStore.getAllSurvey(param);
 //   } catch (e) {
 //     console.log(e);
 //   }
 // };
+
+const fetchSurvey = async () => {
+  try {
+    const surveys = await useSurveyStore.getAllSurvey(param);
+
+    surveyData.value = surveys.map((survey) => ({
+      ...survey,
+      createdAt: format(new Date(survey.createdAt), "yyyy-MM-dd HH:mm:ss"),
+    }));
+    console.log("Danh sách dự án đã cập nhật:", surveyData.value);
+  } catch (e) {
+    console.error("Lỗi khi fetch dự án:", e);
+  }
+};
 
 onMounted(fetchSurvey);
 // onMounted(fetchProject); // const projectStore = useProjectStore();
@@ -156,10 +176,21 @@ const deleteSurvey = async (projectId, surveyId) => {
 
 const openProjectDialogEdit = async (id, name, description) => {
   console.log(id, name, description);
-  await dialogStoreEdit.openDialogEdit("Khảo sát", id, name, description);
-
-  await fetchSurvey(); // Gọi lại API để cập nhật danh sách
+  await dialogStoreEdit.openDialogEdit("Khảo sát", id, name, description, async () => {
+    try {
+      await fetchSurvey();
+    } catch (error) {
+      console.error("Lỗi khi fetch dự án:", error);
+    }
+  });
 };
+
+const filteredItems = computed(() => {
+  console.log(surveyData);
+  return surveyData.value.filter((item) =>
+    item.surveyName.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 </script>
 
 <style scoped>

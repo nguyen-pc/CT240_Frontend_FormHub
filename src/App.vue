@@ -2,6 +2,7 @@
 import HeaderComponent from "./components/Header.vue";
 import ProjectDialog from "./components/ProjectDialog.vue";
 import ProjectDialogEdit from "./components/ProjectDialogEdit.vue";
+import Toaster from "@/components/ui/toast/Toaster.vue";
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import ProjectDialogEdit from "./components/ProjectDialogEdit.vue";
     <router-view />
     <ProjectDialogEdit />
     <ProjectDialog />
+    <Toaster />
   </div>
 </template>
 

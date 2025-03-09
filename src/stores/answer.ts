@@ -75,6 +75,15 @@ export const useAnswerStoreAPI = defineStore('answer', {
       } catch (e: Error | any) {
         throw e.message
       }
+    },
+
+    async getAllResponse(projectId, surveyId){
+      try{
+        const {data} = await useApiPrivate().get(`/project/${projectId}/survey/${surveyId}/response/all`)
+        return data
+      }catch (e: Error | any) {
+        throw e.message
+      }
     }
 
   }
