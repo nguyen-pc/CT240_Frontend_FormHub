@@ -8,6 +8,9 @@ import SignUp from '../views/SignUp.vue'
 
 import SurveyForm from '../views/SurveyForm.vue'
 
+
+import ThankYou from '../components/ThankYou.vue'; // Import trang cảm ơn
+
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -69,7 +72,14 @@ const router = createRouter({
       component: SignUp,
       //hide header
       meta: { hideHeader: true }
-    }
+    },
+
+    {
+      path: '/thank-you',
+      name: 'thank-you',
+      component: ThankYou,
+      meta: { hideHeader: true }
+    },
   ]
 })
 

@@ -17,7 +17,15 @@ const app = createApp(App)
 
 app.use(createPinia())
 
+// authentication.install().then(() => {
+//   app.use(router)
+//   app.mount('#app')
+// })
+
 authentication.install().then(() => {
   app.use(router)
+}).catch(error => {
+  console.error("Authentication failed:", error);
+}).finally(() => {
   app.mount('#app')
 })
