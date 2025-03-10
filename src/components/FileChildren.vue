@@ -35,9 +35,9 @@
         </div>
 
         <div class="actions">
-          <button class="btn add-btn" @click="addItem">
+          <!-- <button class="btn add-btn" @click="addItem">
             <i class="fas fa-plus"></i> Thư mục mới
-          </button>
+          </button> -->
 
           <label class="btn upload-btn">
             <input type="file" class="hidden" @change="handleFileUpload" />Tải tệp lên

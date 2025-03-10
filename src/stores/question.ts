@@ -91,9 +91,9 @@ export const useQuestionStoreAPI = defineStore('question', {
       }
     },
 
-    async submitAnswers(surveyId: any, payload: any) {
+    async submitAnswers(projectId: any, surveyId: any, payload: any) {
       try {
-        const { data } = await useApi().post(`/survey/${surveyId}/response`, payload)
+        const { data } = await useApi().post(`project/${projectId}/survey/${surveyId}/response`, payload)
       } catch (e: Error | any) {
         throw e.message
       }

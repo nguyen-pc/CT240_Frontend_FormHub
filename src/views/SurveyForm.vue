@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    <h2>{{ survey.surveyName }}</h2>
+    <h2 class="!text-green-600">{{ survey.surveyName }}</h2>
+    <p class="text-center italic font-bold">{{ survey.description }}</p>
     <form @submit.prevent="submitSurvey">
       <div v-for="question in questions" :key="question.id" class="question">
         <p>{{ question.questionName }}</p>
@@ -24,7 +25,12 @@
         <!-- Câu hỏi checkbox -->
         <div v-if="question.questionType === 'CHECKBOX'">
           <label v-for="option in question.choices" :key="option.choiceId">
-            <input type="checkbox" :value="option.choiceId" v-model="question.answer" />
+            <input
+              type="checkbox"
+              :value="option.choiceId"
+              :checked="question.answer.includes(option.choiceId)"
+              @change="updateCheckboxSelection(question, option.choiceId)"
+            />
             {{ option.choiceText }}
           </label>
         </div>
@@ -66,7 +72,7 @@
 </template>
 
 <script setup>
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { computed, onMounted, ref, reactive } from "vue";
 import { SurveyStore } from "@/stores/survey";
 import { useQuestionStoreAPI } from "@/stores/question";
@@ -83,6 +89,7 @@ registerPlugin(FilePondPluginFileValidateType, FilePondPluginImagePreview);
 const FilePond = vueFilePond(FilePondPluginFileValidateType, FilePondPluginImagePreview);
 
 const route = useRoute();
+const router = useRouter();
 const projectId = route.params.projectId;
 const surveyId = route.params.surveyId;
 
@@ -97,6 +104,11 @@ const fetchSurvey = async () => {
 
 const fetchQuestion = async () => {
   await QuestionStore.getAllQuestion(projectId, surveyId);
+  questions.value.forEach((question) => {
+    if (question.questionType === "CHECKBOX" && !Array.isArray(question.answer)) {
+      question.answer = []; // Nếu không phải mảng, gán thành mảng rỗng
+    }
+  });
 };
 
 onMounted(() => {
@@ -106,6 +118,19 @@ onMounted(() => {
 
 const survey = computed(() => useSurveyStore.surveys);
 const questions = computed(() => QuestionStore.questions);
+
+const updateCheckboxSelection = (question, choiceId) => {
+  if (!Array.isArray(question.answer)) {
+    question.answer = []; // Nếu chưa khởi tạo, đảm bảo nó là một mảng
+  }
+
+  const index = question.answer.indexOf(choiceId);
+  if (index === -1) {
+    question.answer.push(choiceId); // Nếu chưa có, thêm vào mảng
+  } else {
+    question.answer.splice(index, 1); // Nếu đã có, xóa khỏi mảng
+  }
+};
 
 // const handleFileChange = (question) => (files) => {
 //   console.log(files);
@@ -136,78 +161,65 @@ const handleFileChange = (files) => {
   // );
   return fileData;
 };
-const submitSurvey = async () => {
-  // Tạo payload với field "answers" là mảng
+
+const createSurveyPayload = () => {
   const payload = {
     answers: questions.value
       .map((question) => {
-        // 1) Câu hỏi TEXT
-        if (question.questionType === "TEXT") {
-          return {
-            question: {
-              questionId: question.questionId,
-            },
-            answerText: question.answer || "", // Dữ liệu text người dùng nhập
-            choice: {},
-          };
-        }
+        switch (question.questionType) {
+          case "TEXT":
+            return {
+              question: { questionId: question.questionId },
+              answerText: question.answer || "", // Dữ liệu text (dù nhập gì cũng bị xóa)
+              choices: [],
+            };
 
-        // 2) Câu hỏi MULTIPLE_CHOICE (radio)
-        else if (question.questionType === "MULTIPLE_CHOICE") {
-          return {
-            question: {
-              questionId: question.questionId,
-            },
-            answerText: "", // Với trắc nghiệm, ta để trống
-            choice: {
-              choiceId: question.answer, // ID của lựa chọn được chọn
-            },
-          };
-        }
+          case "MULTIPLE_CHOICE":
+            return {
+              question: { questionId: question.questionId },
+              answerText: "", // Để trống
+              choices: [{ choiceId: question.answer }], // Lưu ID của choice
+            };
 
-        // 3) Câu hỏi CHECKBOX (nhiều lựa chọn)
-        // => Mỗi lựa chọn trả về 1 object
-        else if (question.questionType === "CHECKBOX") {
-          return question.answer.map((choiceId) => ({
-            question: {
-              questionId: question.questionId,
-            },
-            answerText: "",
-            choice: {
-              choiceId: choiceId,
-            },
-          }));
-        }
+          case "CHECKBOX":
+            return {
+              question: { questionId: question.questionId },
+              answerText: "",
+              choices: question.answer.map((choiceId) => ({ choiceId })),
+            };
 
-        // 4) Câu hỏi FILE_UPLOAD
-        // => Bạn muốn lưu file thế nào tùy API; ví dụ:
-        else if (question.questionType === "FILE_UPLOAD") {
-          return {
-            question: {
-              questionId: question.questionId,
-            },
-            answerText: "",
-            choice: {},
-            // Tuỳ yêu cầu backend, có thể gửi kèm mảng file
-            // files: uploadedFiles.value[question.id] || [],
-          };
+          case "FILE_UPLOAD":
+            return {
+              question: { questionId: question.questionId },
+              answerText: "",
+              choices: [],
+              files: uploadedFiles.value[question.questionId] || [], // Nếu có file
+            };
+
+          default:
+            return null;
         }
       })
-      .flat(), // Dùng .flat() để gộp mảng con (CHECKBOX) thành 1 mảng
+      .flat(), // Dùng flat() để gộp lại CHECKBOX (vì nó trả về nhiều object)
   };
 
-  // Kiểm tra kết quả trên console
+  return payload;
+};
+
+const submitSurvey = async () => {
+  const payload = createSurveyPayload();
+
   console.log("Submitting payload:", JSON.stringify(payload, null, 2));
 
-  // Gọi API để gửi dữ liệu, ví dụ:
   try {
-    await QuestionStore.submitAnswers(surveyId, payload);
-    const file = uploadedFiles.value;
-    console.log("file API", file[0]);
-    await useAnswerStore.uploadfile(file[0], surveyId);
-    alert("Khảo sát đã được gửi thành công!");
+    await QuestionStore.submitAnswers(projectId, surveyId, payload);
+    if (uploadedFiles.value.length > 0) {
+      await useAnswerStore.uploadfile(uploadedFiles.value[0], surveyId);
+    }
+    // alert("Khảo sát đã được gửi thành công!");
+    router.push({ name: "thank-you" });
   } catch (e) {
-    console.error("Lỗi khi gửi khảo sát:", e);
+    console.error("❌ Lỗi khi gửi khảo sát:", e);
   }
 };
 </script>

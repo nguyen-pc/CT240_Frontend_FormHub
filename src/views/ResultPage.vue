@@ -32,9 +32,9 @@
                         answer.question.questionType === 'CHECKBOX'
                       "
                     >
-                      <!-- <span v-for="choice in answer.choice" :key="choice.choiceId"> -->
-                      {{ answer.choice.choiceText }}
-                      <!-- </span> -->
+                      <span v-for="choice in answer.choices" :key="choice.choiceId">
+                        | {{ choice.choiceText }} |
+                      </span>
                     </template>
                     <template v-else>
                       {{ answer.answerText }}
@@ -66,6 +66,7 @@ onMounted(async () => {
   const responseDataAPI = await useAnswerStore.getAllResponse(projectId, surveyId);
   responseData.value = responseDataAPI;
 });
+console.log(responseData);
 
 const formatDateTime = (dateString) => {
   return new Date(dateString).toLocaleString("vi-VN", {

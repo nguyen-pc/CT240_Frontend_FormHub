@@ -27,6 +27,11 @@
           <div class="add-question">
             <button @click="addQuestion" class="btn">+ Thêm câu hỏi</button>
           </div>
+          <div class="add-question">
+            <button @click="routerQuestion(projectId, surveyId)" class="btn">
+              Xem preview
+            </button>
+          </div>
           <div class="get-link">
             <button class="btn" @click="getCurrentURL">Sao chép đường dẫn</button>
           </div>
@@ -69,13 +74,18 @@
             </div>
           </div>
           <div class="d-flex flex-column gap-2 optional">
-            <div>
+            <div class="items-center">
               <input
-                v-model="activeQuestion.require"
+                v-model="activeQuestion.isRequired"
                 id="checkRequired"
                 type="checkbox"
+                class="w-5 h-5 rounded border-gray-400 text-green-600 focus:ring focus:ring-green-300 cursor-pointer"
               />
-              <label for="checkRequired">Bắt buộc</label>
+              <label
+                for="checkRequired"
+                class="mb-2 justify-center text-gray-700 font-medium px-1 py-1"
+                >Bắt buộc</label
+              >
             </div>
             <QuestionOption v-model:type="questionType" @update:type="updateType" />
           </div>
@@ -85,7 +95,7 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, watch } from "vue";
 import { useQuestionStore } from "../stores/store";
@@ -93,6 +103,8 @@ import QuestionOption from "@/components/QuestionOption.vue";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuestionStoreAPI } from "@/stores/question";
 import { useRoute } from "vue-router";
+import { toast, type ToastOptions } from "vue3-toastify";
+import router from "@/router";
 const questionStore = useQuestionStore();
 const QuestionStoreAPI = useQuestionStoreAPI();
 const { setActiveQuestion } = questionStore;
@@ -131,7 +143,7 @@ const getFormattedQuestionData = () => {
   const formattedData = {
     questionName: activeQuestion.value.name,
     questionType: activeQuestion.value.type,
-    require: activeQuestion.value.require,
+    isRequire: activeQuestion.value.isRequire,
     choices: activeQuestion.value.choices.map((choice) => ({
       choiceText: choice.name,
     })),
@@ -174,10 +186,39 @@ const setActiveQuestionAPI = async (questionId) => {
 
 console.log("active", activeQuestion);
 const addQuestion = async () => {
-  // questionStore.addQuestion();
-  const questionData = getFormattedQuestionData();
-  await QuestionStoreAPI.createQuestion(projectId, surveyId, questionData);
-  fetchQuestion();
+  try {
+    // questionStore.addQuestion();
+    const questionData = getFormattedQuestionData();
+    await QuestionStoreAPI.createQuestion(projectId, surveyId, questionData);
+    fetchQuestion();
+
+    activeQuestion.value = {
+      name: "",
+      type: "",
+      isRequired: false,
+      choices: [],
+    };
+    console.log(activeQuestion);
+    toast.success("Thêm câu hỏi thành công!", {
+      autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+    } as ToastOptions);
+  } catch (e) {
+    console.log(e);
+    toast.error("Lỗi khi tạo câu hỏi! Vui lòng chọn loại câu hỏi!", {
+      autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+   } as ToastOptions)
+  }
+};
+
+const routerQuestion = () => {
+  const url = router.resolve({
+    name: "surveyform",
+    params: { projectId: projectId, surveyId: surveyId },
+  }).href;
+
+  window.open(url, "_blank"); // Mở trong tab mới
 };
 const addChoice = () => {
   questionStore.addChoice();

@@ -9,6 +9,7 @@ import SignUp from '../views/SignUp.vue'
 import SurveyForm from '../views/SurveyForm.vue'
 
 import { useAuthStore } from '@/stores/auth'
+import ThankYouVue from '@/components/ThankYou.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,7 +60,8 @@ const router = createRouter({
     {
       path: '/main/project/:projectId/survey/:surveyId/question/all',
       name: 'surveyform',
-      component: SurveyForm
+      component: SurveyForm,
+      meta: { hideHeader: true }
     },
     {
       path: '/signin',
@@ -74,6 +76,12 @@ const router = createRouter({
       name: 'signup',
       component: SignUp,
       //hide header
+      meta: { hideHeader: true }
+    },
+    {
+      path: '/thank-you',
+      name: 'thank-you',
+      component: ThankYouVue,
       meta: { hideHeader: true }
     }
   ]

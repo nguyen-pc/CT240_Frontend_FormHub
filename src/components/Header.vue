@@ -13,9 +13,9 @@
     <div class="direction">
       <Breadcrumb :segments="segments" />
       <div v-if="showFormOption" class="form-option">
-        <router-link :to="getModifiedURLQuestion()">
+        <!-- <router-link :to="getModifiedURLQuestion()">
           <button class="btn form">Câu hỏi</button>
-        </router-link>
+        </router-link> -->
         <router-link :to="getModifiedURL()">
           <button class="btn form">Phản hồi</button>
         </router-link>
@@ -43,6 +43,7 @@ export default {
     const segments = ref([]);
     const showFormOption = ref(false);
 
+    const path = route.path;
     const createSegments = (path, params) => {
       console.log("param", params.id);
       const segmentsList = [{ name: "Trang chủ", path: "/" }];
@@ -61,9 +62,9 @@ export default {
           : "/main/project/form";
         segmentsList.push({ name: "Khảo sát", path: surveyId });
       }
-      if (path.includes("/result")) {
-        segmentsList.push({ name: "Kết quả", path: `/main/project/form/result` });
-      }
+      // if (path.includes("/result")) {
+      //   segmentsList.push({ name: "Kết quả", path: `/main/project/form/result` });
+      // }
       return segmentsList;
     };
 
@@ -84,9 +85,29 @@ export default {
       segments.value = createSegments(savedPath);
     });
 
-    const getModifiedURL = () => `${route.path}/result`;
-    const getModifiedURLQuestion = () => `${route.path}/question/all`;
+    const getModifiedURL = () => {
+      let path = route.path;
 
+      // Nếu đường dẫn đã có "/result", giữ nguyên
+      if (path.includes("/result")) {
+        return path;
+      }
+
+      // Nếu chưa có "/result", thêm vào
+      return `${path}/result`;
+    };
+
+    const getModifiedURLQuestion = () => {
+      let path = route.path;
+
+      // Nếu đường dẫn chứa "/question/all/result", loại bỏ "/result"
+      if (path.includes("/question/all/result")) {
+        return path.replace("/question/all/result", "/question/all");
+      }
+
+      // Nếu đã có "/question/all", giữ nguyên, nếu chưa thì thêm vào
+      return path.includes("/question/all") ? path : `${path}/question/all`;
+    };
     const logout = async () => {
       await authStore
         .logout()

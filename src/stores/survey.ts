@@ -1,4 +1,4 @@
-import { useApiPrivate } from '@/composable/useApi'
+import { useApi, useApiPrivate } from '@/composable/useApi'
 import { defineStore } from 'pinia'
 
 export interface SurveyGet {
@@ -52,7 +52,6 @@ export const SurveyStore = defineStore('survey', {
         this.surveys = data
 
         return data
-        console.log(data)
       } catch (e: Error | any) {
         throw e.message
       }
@@ -60,7 +59,7 @@ export const SurveyStore = defineStore('survey', {
 
     async getSurveyById(projectId: any, surveyId: any) {
       try {
-        const { data } = await useApiPrivate().get(`/project/${projectId}/survey/${surveyId}`)
+        const { data } = await useApi().get(`/project/${projectId}/survey/${surveyId}`)
         this.surveys = data
 
         console.log(data)

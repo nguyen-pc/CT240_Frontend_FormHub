@@ -21,20 +21,20 @@
             <i class="fas fa-search"></i>
           </button>
 
-          <select class="btn filter-btn" v-model="selectedType">
+          <!-- <select class="btn filter-btn" v-model="selectedType">
             <option value="">Tất cả</option>
             <option value="folder">Thư mục</option>
             <option value="mp4">MP4</option>
             <option value="docx">DOCX</option>
             <option value="png">PNG</option>
-          </select>
+          </select> -->
         </div>
 
         <div class="actions">
-          <button class="btn add-btn" @click="addItem">
+          <!-- <button class="btn add-btn" @click="addItem">
             <i class="fas fa-plus"></i> Thư mục mới
           </button>
-          <button class="btn upload-btn">Tải tệp lên</button>
+          <button class="btn upload-btn">Tải tệp lên</button> -->
         </div>
 
         <!-- File table -->
@@ -55,20 +55,20 @@
               </td>
               <td>{{ item.createdBy }}</td>
               <td>{{ item.createdAt }}</td>
-              <td>{{ item.size }}</td>
+              <td class="text-clip">{{ item.size }}----</td>
               <td>
                 <DropdownMenu>
                   <DropdownMenuTrigger as-child>
                     <Button variant="outline"> ... </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent class="w-56">
+                  <DropdownMenuContent class="w-45">
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuItem>
-                        <span>Sửa</span>
+                        <span class="cursor-pointer hover:text-yellow-600">Sửa</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <span>Xóa</span>
+                        <span class="cursor-pointer hover:text-yellow-600">Xóa</span>
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
@@ -133,46 +133,6 @@ const items = ref([
     size: "---",
     icon: "fas fa-folder",
     type: "folder",
-  },
-  {
-    name: "Folder 2",
-    owner: "phapchau@gmail.com",
-    modified: "01/02/2025",
-    size: "---",
-    icon: "fas fa-folder",
-    type: "folder",
-  },
-  {
-    name: "Folder 3",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "---",
-    icon: "fas fa-folder",
-    type: "folder",
-  },
-  {
-    name: "search.png",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "4MB",
-    icon: "fas fa-file-image",
-    type: "png",
-  },
-  {
-    name: "work.docx",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "2KB",
-    icon: "fas fa-file-word",
-    type: "docx",
-  },
-  {
-    name: "video.mp4",
-    owner: "ncthien2805@gmail.com",
-    modified: "02/02/2025",
-    size: "10MB",
-    icon: "fas fa-file-video",
-    type: "mp4",
   },
 ]);
 
