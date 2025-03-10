@@ -25,25 +25,25 @@ const router = createRouter({
       path: '/',
       name: 'main',
       component: MainPage,
-      meta: { breadcrumb: 'Trang chủ' }
+      meta: { breadcrumb: 'Trang chủ', requiresAuth: true }
     },
     {
       path: '/main/project/:id',
       name: 'project',
       component: ProjectPage,
-      meta: { breadcrumb: 'Dự án' }
+      meta: { breadcrumb: 'Dự án', requiresAuth: true }
     },
     {
       path: '/main/project/:id/file',
       name: 'project-file',
       component: import('../components/File.vue'),
-      meta: { breadcrumb: 'Tài liệu' }
+      meta: { breadcrumb: 'Tài liệu', requiresAuth: true }
     },
     {
       path: '/main/project/:id/file/:folderId',
       name: 'project-file-children',
       component: import('../components/FileChildren.vue'),
-      meta: { breadcrumb: 'Tài liệu' }
+      meta: { breadcrumb: 'Tài liệu', requiresAuth: true }
     },
     {
       path: '/main/project/:projectId/survey/:surveyId',
@@ -55,7 +55,7 @@ const router = createRouter({
       path: '/main/project/:projectId/survey/:surveyId/result',
       name: 'form-result',
       component: ResultPage,
-      meta: { breadcrumb: 'Phản hồi' }
+      meta: { breadcrumb: 'Phản hồi', requiresAuth: true }
     },
     {
       path: '/main/project/:projectId/survey/:surveyId/question/all',
@@ -68,7 +68,7 @@ const router = createRouter({
       name: 'signin',
       component: SignIn,
       //hide header
-      meta: { hideHeader: true, breadcrumb: 'Phản hồi' }
+      meta: { hideHeader: true, breadcrumb: 'Phản hồi', requiresAuth: true }
     },
 
     {
@@ -86,8 +86,6 @@ const router = createRouter({
     }
   ]
 })
-
-// requiresAuth: true
 
 router.beforeResolve(async (to, from, next) => {
   const authStore = useAuthStore()

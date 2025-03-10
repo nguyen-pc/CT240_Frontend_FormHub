@@ -88,7 +88,7 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { useRoute, useRouter } from "vue-router";
 import { useDialogStore, useDialogStoreEdit, useFormStore } from "../stores/store";
 import { computed, onMounted, ref } from "vue";
@@ -109,6 +109,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ProjectStore } from "@/stores/project";
 import { format } from "date-fns";
+import { toast, type ToastOptions } from "vue3-toastify";
 const useSurveyStore = SurveyStore();
 const useProjectStore = ProjectStore();
 const router = useRouter();
@@ -170,8 +171,20 @@ onMounted(async () => {
 });
 
 const deleteSurvey = async (projectId, surveyId) => {
-  await useSurveyStore.deleteSurvey(projectId, surveyId);
-  await fetchSurvey();
+  try {
+    await useSurveyStore.deleteSurvey(projectId, surveyId);
+    await fetchSurvey();
+    toast.success("Xóa khảo sát thành công!", {
+      autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+   } as ToastOptions)
+  } catch (e) {
+    console.log(e);
+    toast.error("Lỗi khi xóa khảo sát!", {
+      autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+   } as ToastOptions)
+  }
 };
 
 const openProjectDialogEdit = async (id, name, description) => {
