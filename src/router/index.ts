@@ -63,13 +63,13 @@ const router = createRouter({
       component: SurveyForm,
       meta: { hideHeader: true }
     },
-    {
-      path: '/signin',
-      name: 'signin',
-      component: SignIn,
-      //hide header
-      meta: { hideHeader: true, breadcrumb: 'Phản hồi', requiresAuth: true }
-    },
+    // {
+    //   path: '/signin',
+    //   name: 'signin',
+    //   component: SignIn,
+    //   //hide header
+    //   meta: { hideHeader: true, breadcrumb: 'Phản hồi', requiresAuth: true }
+    // },
 
     {
       path: '/signup',
