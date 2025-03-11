@@ -52,39 +52,41 @@ export const useAnswerStoreAPI = defineStore('answer', {
         throw e.message
       }
     },
-    async getFile(surveyId: any){
-      try{
-        const {data} = await useApiPrivate().get(`files/${surveyId}/list`)
-        return data
-      }catch (e: Error | any) {
-        throw e.message
-      }
-    },
-    async downloadFile(folder: any, fileName: any){
-      try{
-        const {data} = await useApiPrivate().get(`/files?folder=${folder}&fileName=${fileName}`)
+    async getFile(surveyId: any) {
+      try {
+        const { data } = await useApiPrivate().get(`files/${surveyId}/list`)
         return data
       } catch (e: Error | any) {
         throw e.message
       }
     },
-    async deleteFile(folder: any, fileName: any){
-      try{
-        const {data} = await useApiPrivate().delete(`/files?folder=${folder}&fileName=${fileName}`)
-        
+    async downloadFile(folder: any, fileName: any) {
+      try {
+        const { data } = await useApiPrivate().get(`/files?folder=${folder}&fileName=${fileName}`)
+        return data
+      } catch (e: Error | any) {
+        throw e.message
+      }
+    },
+    async deleteFile(folder: any, fileName: any) {
+      try {
+        const { data } = await useApiPrivate().delete(
+          `/files?folder=${folder}&fileName=${fileName}`
+        )
       } catch (e: Error | any) {
         throw e.message
       }
     },
 
-    async getAllResponse(projectId, surveyId){
-      try{
-        const {data} = await useApiPrivate().get(`/project/${projectId}/survey/${surveyId}/response/all`)
+    async getAllResponse(projectId, surveyId) {
+      try {
+        const { data } = await useApiPrivate().get(
+          `/project/${projectId}/survey/${surveyId}/response/all`
+        )
         return data
-      }catch (e: Error | any) {
+      } catch (e: Error | any) {
         throw e.message
       }
     }
-
   }
 })

@@ -28,12 +28,11 @@
                     <template
                       v-if="
                         answer.question.questionType === 'MULTIPLE_CHOICE' ||
-                        answer.question.questionType === 'FILE_UPLOAD' ||
                         answer.question.questionType === 'CHECKBOX'
                       "
                     >
                       <span v-for="choice in answer.choices" :key="choice.choiceId">
-                        | {{ choice.choiceText }} |
+                        {{ choice.choiceText + " " }}
                       </span>
                     </template>
                     <template v-else>

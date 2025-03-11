@@ -23,10 +23,10 @@
             <input type="radio" v-model="question.answer" :value="option.choiceId" />
             {{ option.choiceText }}
           </label>
-          <p v-if="question.isRequired && !question.answer" class="text-red-500 text-sm">
-            * Vui lòng nhập câu trả lời!
-          </p>
         </div>
+        <!-- <p v-if="question.isRequired && !question.answer" class="text-red-500 text-sm">
+          * Vui lòng chọn câu trả lời!
+        </p> -->
 
         <!-- Câu hỏi checkbox -->
         <div v-if="question.questionType === 'CHECKBOX'">
@@ -58,9 +58,9 @@
             ]"
             @updatefiles="handleFileChange"
           />
-          <p v-if="question.isRequired && !question.answer" class="text-red-500 text-sm">
+          <!-- <p v-if="question.isRequired && !question.answer" class="text-red-500 text-sm">
             * Vui lòng nhập câu trả lời!
-          </p>
+          </p> -->
 
           <!-- Hiển thị danh sách file đã tải lên -->
           <div v-if="uploadedFiles[question.id] && uploadedFiles[question.id].length">
@@ -201,9 +201,8 @@ const createSurveyPayload = () => {
           case "FILE_UPLOAD":
             return {
               question: { questionId: question.questionId },
-              answerText: "",
+              answerText: "File",
               choices: [],
-              files: uploadedFiles.value[question.questionId] || [], // Nếu có file
             };
 
           default:
@@ -232,7 +231,7 @@ const submitSurvey = async () => {
         (!uploadedFiles.value[question.id] ||
           uploadedFiles.value[question.id].length === 0)
       ) {
-        isValid = false;
+        isValid = true;
       }
     }
   });
@@ -249,6 +248,7 @@ const submitSurvey = async () => {
   try {
     await QuestionStore.submitAnswers(projectId, surveyId, payload);
     if (uploadedFiles.value.length > 0) {
+      console.log("valuu", uploadedFiles.value[0]);
       await useAnswerStore.uploadfile(uploadedFiles.value[0], surveyId);
     }
     // alert("Khảo sát đã được gửi thành công!");
