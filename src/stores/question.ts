@@ -87,13 +87,17 @@ export const useQuestionStoreAPI = defineStore('question', {
           payload
         )
       } catch (e: Error | any) {
+        console.log('error', e)
         throw e.message
       }
     },
 
     async submitAnswers(projectId: any, surveyId: any, payload: any) {
       try {
-        const { data } = await useApi().post(`project/${projectId}/survey/${surveyId}/response`, payload)
+        const { data } = await useApi().post(
+          `project/${projectId}/survey/${surveyId}/response`,
+          payload
+        )
       } catch (e: Error | any) {
         throw e.message
       }

@@ -3,7 +3,7 @@
     <div class="container">
       <div class="sidebar">
         <div class="sidebar-header">
-          <h2>Form 1</h2>
+          <h2>{{ surveyData.surveyName }}</h2>
         </div>
         <ScrollArea>
           <div class="sidebar-menu">
@@ -25,7 +25,7 @@
       <div class="main-content">
         <div class="action-bar">
           <div class="add-question">
-            <button @click="addQuestion" class="btn">+ Thêm câu hỏi</button>
+            <button @click="newQuestion" class="btn">+ Thêm câu hỏi</button>
           </div>
           <div class="add-question">
             <button @click="routerQuestion(projectId, surveyId)" class="btn">
@@ -40,7 +40,10 @@
           <div class="question-content">
             <div v-if="activeQuestion">
               <!-- <h4>{{ activeQuestion.title }}</h4> -->
-              <h4>Câu hỏi mới</h4>
+              <h4>
+                {{ isEdit ? "Sửa câu hỏi" : "Thêm câu hỏi" }}
+              </h4>
+              <!-- <h4>Câu hỏi mới</h4> -->
               <div class="question-box">
                 <input
                   v-model="questionName"
@@ -62,7 +65,7 @@
                       >
                         <input
                           class="choice"
-                          v-model="choice.name"
+                          v-model="choice.choiceText"
                           :placeholder="choice.placeholder"
                         />
                         <i class="fa fa-trash" @click="deleteChoice(choice.id)"></i>
@@ -70,6 +73,12 @@
                     </div>
                   </ScrollArea>
                 </div>
+                <button
+                  @click="addAndUpdateQuestion"
+                  class="btn !text-gray-900 !bg-white"
+                >
+                  {{ isEdit ? "Sửa câu hỏi" : "Thêm câu hỏi" }}
+                </button>
               </div>
             </div>
           </div>
@@ -105,15 +114,28 @@ import { useQuestionStoreAPI } from "@/stores/question";
 import { useRoute } from "vue-router";
 import { toast, type ToastOptions } from "vue3-toastify";
 import router from "@/router";
+import { SurveyStore } from "@/stores/survey";
 const questionStore = useQuestionStore();
 const QuestionStoreAPI = useQuestionStoreAPI();
 const { setActiveQuestion } = questionStore;
 const { questions, activeQuestion } = storeToRefs(questionStore);
 
+const surveyStore = SurveyStore()
 const route = useRoute();
 const projectId = route.params.projectId;
 const surveyId = route.params.surveyId;
+let questionIdData = 1 ;
 const questionData = ref({});
+const surveyData = ref({})
+
+let isEdit = false
+
+const fetchSurvey = async () => {
+  const survey = await surveyStore.getSurveyById(projectId, surveyId)
+  surveyData.value = survey
+}
+
+onMounted(fetchSurvey)
 
 const fetchQuestion = async () => {
   console.log("Fetching question...");
@@ -143,9 +165,9 @@ const getFormattedQuestionData = () => {
   const formattedData = {
     questionName: activeQuestion.value.name,
     questionType: activeQuestion.value.type,
-    isRequire: activeQuestion.value.isRequire,
+    isRequired: activeQuestion.value.isRequired,
     choices: activeQuestion.value.choices.map((choice) => ({
-      choiceText: choice.name,
+      choiceText: choice.choiceText,
     })),
   };
 
@@ -160,55 +182,72 @@ const setActiveQuestionAPI = async (questionId) => {
       surveyId,
       questionId
     );
+    isEdit = true
+    questionIdData = questionId
     console.log(question);
+    questionName.value = question.questionName
+    questionType.value = question.questionType
+    questionChoices.value = question.choices
+    console.log("questionChoice",questionChoices)
     // questionStore.setActiveQuestion(question); // Cập nhật vào Pinia
   } catch (e) {
     console.error("Lỗi khi lấy câu hỏi:", e);
   }
 };
-// const questionName = computed({
-//   get: () => activeQuestion.value?.name || "",
-//   set: (newName) => {
-//     if (activeQuestion.value) {
-//       activeQuestion.value.name = newName;
-//     }
-//   },
-// });
-
-// const questionType = computed({
-//   get: () => activeQuestion.value?.type || "",
-//   set: (newType) => {
-//     if (activeQuestion.value) {
-//       activeQuestion.value.type = newType;
-//     }
-//   },
-// });
 
 console.log("active", activeQuestion);
-const addQuestion = async () => {
-  try {
-    // questionStore.addQuestion();
-    const questionData = getFormattedQuestionData();
-    await QuestionStoreAPI.createQuestion(projectId, surveyId, questionData);
-    fetchQuestion();
+const newQuestion = () => {
+   isEdit = false
+    questionName.value = ""
+    questionType.value = ""
+}
+const addAndUpdateQuestion = async () => {
+  console.log("isEdit", isEdit)
+  if(isEdit === false){
+    try {
+      // questionStore.addQuestion();
+      const questionData = getFormattedQuestionData();
+      console.log(questionData)
+      console.log("questionData",questionData)
+      await QuestionStoreAPI.createQuestion(projectId, surveyId, questionData);
+      fetchQuestion();
 
-    activeQuestion.value = {
-      name: "",
-      type: "",
-      isRequired: false,
-      choices: [],
-    };
-    console.log(activeQuestion);
-    toast.success("Thêm câu hỏi thành công!", {
-      autoClose: 2000,
-      position: toast.POSITION.BOTTOM_RIGHT,
-    } as ToastOptions);
-  } catch (e) {
-    console.log(e);
-    toast.error("Lỗi khi tạo câu hỏi! Vui lòng chọn loại câu hỏi!", {
-      autoClose: 2000,
-      position: toast.POSITION.BOTTOM_RIGHT,
-   } as ToastOptions)
+      questionName.value = ""
+      questionType.value = ""
+      questionChoices.value=[]
+
+      toast.success("Thêm câu hỏi thành công!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+    } catch (e) {
+      console.log(e);
+      toast.error("Lỗi khi tạo câu hỏi! Vui lòng chọn loại câu hỏi!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+     } as ToastOptions)
+    }
+  }else{
+    try{
+      console.log("Edit")
+      console.log(questionIdData)
+      const questionData = getFormattedQuestionData();
+      console.log(questionData)
+      console.log("questionData Edit",questionData)
+      await QuestionStoreAPI.editQuestionById(projectId, surveyId, questionIdData, questionData)
+      fetchQuestion();
+      toast.success("Sửa câu hỏi thành công!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      } as ToastOptions);
+
+    }catch(e){
+      console.log(e)
+      toast.error("Lỗi khi sưa câu hỏi! Vui lòng chọn loại câu hỏi!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+     } as ToastOptions)
+    }
   }
 };
 
@@ -227,22 +266,31 @@ const addChoice = () => {
 // Cả 2 đại diện cho khung câu hỏi hiển thị
 const questionName = ref(activeQuestion?.value?.name || "");
 const questionType = ref(activeQuestion?.value?.type || "");
+const questionChoices = ref(activeQuestion?.value?.choices || [])
+console.log("questionChoice thay đổi",questionChoices)
 // Cập nhật giá trị name của câu hỏi khi thay đổi
 watch(questionName, (newName) => {
   activeQuestion.value.name = newName;
 });
+
 // Cập nhật giá trị type của câu hỏi khi thay đổi
 watch(questionType, (newType) => {
   activeQuestion.value.type = newType;
 });
 
+// Cập nhật giá trị type của câu hỏi khi thay đổi
+watch(questionChoices, (newType) => {
+  activeQuestion.value.choices = newType;
+});
+
+
 watch(
   activeQuestion,
   (newQuestion) => {
-    //Cập nhật giá trị đúng question box khi chuyển sang câu khác
-    questionName.value = newQuestion.name;
-    questionType.value = newQuestion.type;
-    //console.log(activeQuestion.value);
+    console.log("Câu hỏi hiện tại thay đổi:", newQuestion);
+    if (!newQuestion) return;
+    questionName.value = newQuestion.name || "";
+    questionType.value = newQuestion.type || "";
   },
   { deep: true }
 );

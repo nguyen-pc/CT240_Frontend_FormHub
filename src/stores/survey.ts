@@ -61,8 +61,7 @@ export const SurveyStore = defineStore('survey', {
       try {
         const { data } = await useApi().get(`/project/${projectId}/survey/${surveyId}`)
         this.surveys = data
-
-        console.log(data)
+        return data
       } catch (e: Error | any) {
         throw e.message
       }

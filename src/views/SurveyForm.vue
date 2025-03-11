@@ -13,6 +13,9 @@
           v-model="question.answer"
           type="text"
         />
+        <p v-if="question.isRequired && !question.answer" class="text-red-500 text-sm">
+          * Vui lòng nhập câu trả lời!
+        </p>
 
         <!-- Câu hỏi trắc nghiệm -->
         <div v-if="question.questionType === 'MULTIPLE_CHOICE'">
@@ -20,6 +23,9 @@
             <input type="radio" v-model="question.answer" :value="option.choiceId" />
             {{ option.choiceText }}
           </label>
+          <p v-if="question.isRequired && !question.answer" class="text-red-500 text-sm">
+            * Vui lòng nhập câu trả lời!
+          </p>
         </div>
 
         <!-- Câu hỏi checkbox -->
@@ -52,6 +58,9 @@
             ]"
             @updatefiles="handleFileChange"
           />
+          <p v-if="question.isRequired && !question.answer" class="text-red-500 text-sm">
+            * Vui lòng nhập câu trả lời!
+          </p>
 
           <!-- Hiển thị danh sách file đã tải lên -->
           <div v-if="uploadedFiles[question.id] && uploadedFiles[question.id].length">
@@ -118,6 +127,7 @@ onMounted(() => {
 
 const survey = computed(() => useSurveyStore.surveys);
 const questions = computed(() => QuestionStore.questions);
+console.log(questions);
 
 const updateCheckboxSelection = (question, choiceId) => {
   if (!Array.isArray(question.answer)) {
@@ -207,6 +217,31 @@ const createSurveyPayload = () => {
 };
 
 const submitSurvey = async () => {
+  let isValid = true;
+
+  questions.value.forEach((question) => {
+    if (question.isRequired) {
+      if (question.questionType === "TEXT" && !question.answer) {
+        isValid = false;
+      } else if (question.questionType === "MULTIPLE_CHOICE" && !question.answer) {
+        isValid = false;
+      } else if (question.questionType === "CHECKBOX" && question.answer.length === 0) {
+        isValid = false;
+      } else if (
+        question.questionType === "FILE_UPLOAD" &&
+        (!uploadedFiles.value[question.id] ||
+          uploadedFiles.value[question.id].length === 0)
+      ) {
+        isValid = false;
+      }
+    }
+  });
+
+  if (!isValid) {
+    alert("⚠️ Vui lòng điền đầy đủ thông tin trước khi gửi!");
+    return;
+  }
+
   const payload = createSurveyPayload();
 
   console.log("Submitting payload:", JSON.stringify(payload, null, 2));
