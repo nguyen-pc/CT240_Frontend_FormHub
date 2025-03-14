@@ -10,14 +10,13 @@
     <div class="right-section">
       <div class="form-container">
         <div class="page">
+          <h3>ĐĂNG KÝ</h3>
+          <SignInForm />
+          <p>{{ message }}</p>
 
-        <h3 >ĐĂNG KÝ</h3>  
-        <SignInForm />
-        <p>{{ message }}</p>
-     
-      <div style="margin-bottom: 10px;">Đã có tài khoản?</div>
-        <button class="btn_login">Đăng Nhập</button>
+          <div style="margin-bottom: 10px">Đã có tài khoản?</div>
 
+          <button @click="login" class="btn_login">Đăng Nhập</button>
         </div>
       </div>
     </div>

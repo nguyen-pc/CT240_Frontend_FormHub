@@ -4,6 +4,7 @@
       <div class="container">
         <div class="main-content">
           <div class="table-responsive">
+            <button @click="exportToExcel" class="export-btn">Xuất Excel</button>
             <table class="table">
               <thead>
                 <tr>
@@ -54,18 +55,90 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import ScrollArea from "@/components/ui/scroll-area/ScrollArea.vue";
 import { useAnswerStoreAPI } from "@/stores/answer";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { SurveyStore } from "@/stores/survey";
 
 const route = useRoute();
 const useAnswerStore = useAnswerStoreAPI();
+const surveyStore = SurveyStore();
 const projectId = route.params.projectId;
 const surveyId = route.params.surveyId;
 const responseData = ref([]);
+const surveyData = ref({});
 
 onMounted(async () => {
   const responseDataAPI = await useAnswerStore.getAllResponse(projectId, surveyId);
   responseData.value = responseDataAPI;
 });
-console.log(responseData);
+
+const fetchSurvey = async () => {
+  const survey = await surveyStore.getSurveyById(projectId, surveyId);
+  surveyData.value = survey;
+};
+
+onMounted(fetchSurvey);
+console.log(surveyData);
+console.log(surveyData.value);
+
+// Hàm xuất file Excel
+const exportToExcel = () => {
+  if (responseData.value.length === 0) {
+    alert("Không có dữ liệu để xuất!");
+    return;
+  }
+
+  // Chuẩn bị dữ liệu tiêu đề
+  const sheetData = [];
+  sheetData.push([
+    `Biểu mẫu: ${surveyData.value.surveyName || "Biểu mẫu không có tiêu đề"}`,
+  ]); // Hàng tiêu đề
+  sheetData.push([]); // Dòng trống
+
+  // Chuẩn bị tiêu đề cột
+  const headers = ["Ngày hoàn thành", "Người thực hiện"];
+  if (responseData.value.length > 0) {
+    responseData.value[0].answers.forEach((_, index) => {
+      headers.push(`Câu hỏi ${index + 1}`);
+    });
+  }
+  sheetData.push(headers);
+
+  // Chuẩn bị dữ liệu cho từng hàng
+  responseData.value.forEach((item) => {
+    const row = [
+      formatDateTime(item.answers[0]?.createdAt),
+      item.answers[0]?.question.createdBy,
+    ];
+
+    item.answers.forEach((answer) => {
+      if (
+        answer.question.questionType === "MULTIPLE_CHOICE" ||
+        answer.question.questionType === "CHECKBOX"
+      ) {
+        row.push(answer.choices.map((choice) => choice.choiceText).join(", "));
+      } else {
+        row.push(answer.answerText);
+      }
+    });
+
+    sheetData.push(row);
+  });
+
+  // Chuyển đổi thành worksheet
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Responses");
+
+  // Xuất file
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([excelBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+
+  const fileName = `responses_${surveyData.value.surveyName || "survey"}.xlsx`;
+  saveAs(blob, fileName);
+};
 
 const formatDateTime = (dateString) => {
   return new Date(dateString).toLocaleString("vi-VN", {
@@ -102,6 +175,19 @@ const formatDateTime = (dateString) => {
   flex-direction: column;
   margin-left: 15px;
   overflow: auto;
+}
+.export-btn {
+  background-color: #6914cd;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.export-btn:hover {
+  background-color: #2674fc;
 }
 
 .table-responsive {
