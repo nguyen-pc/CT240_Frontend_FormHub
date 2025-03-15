@@ -183,35 +183,30 @@ const createSurveyPayload = () => {
               answerText: question.answer || "", // Dữ liệu text (dù nhập gì cũng bị xóa)
               choices: [],
             };
-
           case "MULTIPLE_CHOICE":
             return {
               question: { questionId: question.questionId },
               answerText: "", // Để trống
               choices: [{ choiceId: question.answer }], // Lưu ID của choice
             };
-
           case "CHECKBOX":
             return {
               question: { questionId: question.questionId },
               answerText: "",
               choices: question.answer.map((choiceId) => ({ choiceId })),
             };
-
           case "FILE_UPLOAD":
             return {
               question: { questionId: question.questionId },
               answerText: "File",
               choices: [],
             };
-
           default:
             return null;
         }
       })
       .flat(), // Dùng flat() để gộp lại CHECKBOX (vì nó trả về nhiều object)
   };
-
   return payload;
 };
 

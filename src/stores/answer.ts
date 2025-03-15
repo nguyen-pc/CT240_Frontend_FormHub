@@ -54,7 +54,7 @@ export const useAnswerStoreAPI = defineStore('answer', {
     },
     async getFile(surveyId: any) {
       try {
-        const { data } = await useApiPrivate().get(`files/${surveyId}/list`)
+        const { data } = await useApi().get(`files/${surveyId}/list`)
         return data
       } catch (e: Error | any) {
         throw e.message
@@ -62,7 +62,7 @@ export const useAnswerStoreAPI = defineStore('answer', {
     },
     async downloadFile(folder: any, fileName: any) {
       try {
-        const { data } = await useApiPrivate().get(`/files?folder=${folder}&fileName=${fileName}`)
+        const { data } = await useApi().get(`/files?folder=${folder}&fileName=${fileName}`)
         return data
       } catch (e: Error | any) {
         throw e.message
@@ -78,7 +78,7 @@ export const useAnswerStoreAPI = defineStore('answer', {
       }
     },
 
-    async getAllResponse(projectId, surveyId) {
+    async getAllResponse(projectId: any, surveyId: any) {
       try {
         const { data } = await useApiPrivate().get(
           `/project/${projectId}/survey/${surveyId}/response/all`

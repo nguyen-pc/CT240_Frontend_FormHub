@@ -19,13 +19,16 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in responseData" :key="item.responseId">
+                <tr v-for="(item, indexResponse) in responseData" :key="item.responseId">
                   <td>
                     <input type="checkbox" />
                   </td>
                   <td>{{ formatDateTime(item.answers[0]?.createdAt) }}</td>
                   <td>{{ item.answers[0]?.question.createdBy }}</td>
-                  <td v-for="answer in item.answers" :key="answer.answerId">
+                  <td
+                    v-for="(answer, indexAnswer) in item.answers"
+                    :key="answer.answerId"
+                  >
                     <template
                       v-if="
                         answer.question.questionType === 'MULTIPLE_CHOICE' ||
@@ -36,6 +39,17 @@
                         {{ choice.choiceText + " " }}
                       </span>
                     </template>
+                    <template v-if="answer.question.questionType === 'FILE_UPLOAD'">
+                      <span
+                        v-if="fileData[indexResponse]"
+                        @click="openFile(fileData[indexResponse].fileName)"
+                        class="cursor-pointer hover:text-yellow-600 text-blue-500"
+                      >
+                        FILE
+                      </span>
+                      <span v-else>Không có tệp</span>
+                    </template>
+
                     <template v-else>
                       {{ answer.answerText }}
                     </template>
@@ -58,6 +72,7 @@ import { useAnswerStoreAPI } from "@/stores/answer";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { SurveyStore } from "@/stores/survey";
+import { format } from "date-fns";
 
 const route = useRoute();
 const useAnswerStore = useAnswerStoreAPI();
@@ -66,6 +81,7 @@ const projectId = route.params.projectId;
 const surveyId = route.params.surveyId;
 const responseData = ref([]);
 const surveyData = ref({});
+const fileData = ref([]);
 
 onMounted(async () => {
   const responseDataAPI = await useAnswerStore.getAllResponse(projectId, surveyId);
@@ -78,6 +94,24 @@ const fetchSurvey = async () => {
 };
 
 onMounted(fetchSurvey);
+onMounted(async () => {
+  const files = await useAnswerStore.getFile(surveyId);
+  // Format lại dữ liệu
+  const formattedFiles = files.map((file) => ({
+    ...file,
+    fileSize: `${(file.fileSize / 1024).toFixed(2)} KB`, // Chuyển Byte -> KB, làm tròn 2 chữ số thập phân
+    createdAt: format(new Date(file.createdAt), "yyyy-MM-dd HH:mm:ss"), // Format thời gian
+  }));
+
+  fileData.value = formattedFiles;
+  console.log("Formatted file data", fileData.value[0].fileName);
+});
+
+const openFile = (fileName) => {
+  const fileUrl = `${import.meta.env.VITE_API_URI}/storage/${surveyId}/${fileName}`;
+  window.open(fileUrl, "_blank"); // Mở file trong tab mới
+};
+
 console.log(surveyData);
 console.log(surveyData.value);
 
@@ -88,14 +122,12 @@ const exportToExcel = () => {
     return;
   }
 
-  // Chuẩn bị dữ liệu tiêu đề
   const sheetData = [];
   sheetData.push([
     `Biểu mẫu: ${surveyData.value.surveyName || "Biểu mẫu không có tiêu đề"}`,
   ]); // Hàng tiêu đề
   sheetData.push([]); // Dòng trống
 
-  // Chuẩn bị tiêu đề cột
   const headers = ["Ngày hoàn thành", "Người thực hiện"];
   if (responseData.value.length > 0) {
     responseData.value[0].answers.forEach((_, index) => {
@@ -104,19 +136,31 @@ const exportToExcel = () => {
   }
   sheetData.push(headers);
 
-  // Chuẩn bị dữ liệu cho từng hàng
-  responseData.value.forEach((item) => {
+  responseData.value.forEach((item, indexResponse) => {
     const row = [
       formatDateTime(item.answers[0]?.createdAt),
       item.answers[0]?.question.createdBy,
     ];
 
-    item.answers.forEach((answer) => {
+    item.answers.forEach((answer, indexAnswer) => {
       if (
         answer.question.questionType === "MULTIPLE_CHOICE" ||
         answer.question.questionType === "CHECKBOX"
       ) {
         row.push(answer.choices.map((choice) => choice.choiceText).join(", "));
+      } else if (answer.question.questionType === "FILE_UPLOAD") {
+        if (fileData.value[indexResponse]) {
+          const fileName = fileData.value[indexResponse].fileName;
+          const fileUrl = `${
+            import.meta.env.VITE_API_URI
+          }/storage/${surveyId}/${fileName}`;
+          row.push({
+            v: `FILE`, // Văn bản hiển thị
+            l: { Target: fileUrl }, // Gán hyperlink
+          });
+        } else {
+          row.push("Không có tệp");
+        }
       } else {
         row.push(answer.answerText);
       }
@@ -125,12 +169,10 @@ const exportToExcel = () => {
     sheetData.push(row);
   });
 
-  // Chuyển đổi thành worksheet
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Responses");
 
-  // Xuất file
   const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   const blob = new Blob([excelBuffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

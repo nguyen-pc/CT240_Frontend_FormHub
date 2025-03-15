@@ -50,7 +50,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in surveys" :key="index">
-              <td @click="goToFileChildren" class="cursor-pointer">
+              <td @click="goToFileChildren(item.surveyId)" class="cursor-pointer">
                 <i :class="item.icon"></i> 📁{{ item.surveyName }}
               </td>
               <td>{{ item.createdBy }}</td>
@@ -166,7 +166,7 @@ const filteredItems = computed(() => {
 });
 
 const goToFileChildren = (surveyId) => {
-  router.push(`/main/project/3/file/1`);
+  router.push(`/main/project/${projectId}/file/${surveyId}`);
 };
 
 // onMounted(async () => {
